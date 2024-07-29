@@ -1,0 +1,80 @@
+/* vi: set sw=4 ts=4 expandtab: */
+#include <windows.h>
+#include "bitmap.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+// Icon
+RCICON	  ICON DISCARDABLE  "rcIcon.ico"
+SMALL 	  ICON DISCARDABLE  "Small.ico"
+
+// Menu
+RCMENU MENU DISCARDABLE
+  BEGIN
+  POPUP "选项(&O)"
+  BEGIN
+    MENUITEM "选项(&O)...\tCtrl+O",	  IDM_OPEN
+    MENUITEM SEPARATOR
+    MENUITEM "退出(&X)",	          IDM_EXIT
+  END
+  POPUP "帮助(&H)"
+  BEGIN
+    MENUITEM "关于(&A)...\tF1",	          IDM_ABOUT
+  END
+END
+
+// Dialog
+ABOUTBOX DIALOG DISCARDABLE 20,25,124, 77
+STYLE DS_MODALFRAME | WS_POPUP |WS_VISIBLE |WS_CAPTION | WS_SYSMENU
+CAPTION "关于位图示范程序"
+FONT 14, "隶书_GB2312"
+BEGIN
+  PUSHBUTTON "确定",                                              IDOK,       43, 51, 40, 14
+  CTEXT       "本示范程序用来介绍位图、光标以及字符串资源的用法", IDC_STATIC,  25, 1, 92, 20
+  CTEXT       "XXX编写",                                          IDC_STATIC,  32, 24, 76, 10,  NOT WS_GROUP
+  CTEXT       "一九九六年八月",                                   IDC_STATIC,  36, 37, 65, 8,   NOT WS_GROUP
+  ICON        "RCICON",                                           IDC_STATIC,  11, 23, 18, 20
+  CONTROL     "",                         IDC_STATIC, "Static", SS_BLACKFRAME, 40, 34, 56, 1
+END
+
+
+TEXTBOX DIALOG DISCARDABLE 5, 28, 162, 77
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP |WS_CAPTION | WS_SYSMENU
+CAPTION "文字选项对话框"
+FONT 14, "仿宋_GB2312"
+BEGIN
+    DEFPUSHBUTTON "确定", IDOK, 2, 59, 29, 14
+    PUSHBUTTON    "取消", IDCANCEL, 36, 59, 28, 14
+    RADIOBUTTON   "红色", IDD_RED, 13, 16, 27, 10
+    RADIOBUTTON   "蓝色", IDD_BLUE, 13, 29, 27, 10
+    GROUPBOX      "文字颜色", IDC_STATIC, 7, 3, 43, 44
+    CONTROL       "天上有个太阳", IDD_DAY, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 69, 16, 56, 10
+    CONTROL       "水中有个月亮", IDD_NIGHT, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 69, 38, 56, 10
+    GROUPBOX      "文字内容", IDC_STATIC, 66, 3, 89, 70
+    CONTROL       "SUN", IDC_STATIC, "Static", SS_BITMAP, 129, 12, 9, 9
+    CONTROL       "MOON", IDC_STATIC, "Static", SS_BITMAP, 129, 37, 9, 9
+END
+
+
+// Accelerator
+RCMENU ACCELERATORS DISCARDABLE
+BEGIN
+    VK_F1,    IDM_ABOUT,    VIRTKEY, NOINVERT
+    "^O",     IDM_OPEN,     ASCII, NOINVERT
+END
+
+//Cursor
+RCCURSOR      CURSOR  DISCARDABLE     "rcCursor.cur"
+
+//Bitmap
+SUN       BITMAP DISCARDABLE  "sun.bmp"
+MOON      BITMAP DISCARDABLE  "moon.bmp"
+
+
+// String Table
+STRINGTABLE  DISCARDABLE
+BEGIN
+    IDS_SUN   "天上有个"
+    IDS_MOON  "水中有个"
+END
