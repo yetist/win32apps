@@ -123,7 +123,7 @@ LRESULT APIENTRY MainWndProc(HWND hwndMain,
     case WM_SETFOCUS:
       /* 当窗口拥有键盘输入焦点时，创建、定位并显示插入符 */
       /* 装入应用程序定义的插入符位图资源 */
-      hBmpCaret = (HWND) LoadBitmap(hInst, "Caret");
+      hBmpCaret = (HWND) LoadBitmap(hInst, TEXT("Caret"));
       /* 创建插入符 */
       CreateCaret(hwndMain, (HBITMAP) hBmpCaret, 0, 0);
       /* 调整插入符的位置 */
@@ -138,25 +138,25 @@ LRESULT APIENTRY MainWndProc(HWND hwndMain,
     case WM_CHAR:
       switch (wParam)
         {
-        case 0x0A:
-        case 0x1B:
+        case 0x0A: /* linefeed */
+        case VK_ESCAPE: //0x1B:
           MessageBeep(0xFFFFFFFF);
           return 0;
-        case 0x08:  /* 退格字符 */
+        case VK_BACK:   /* 退格字符 */
           if (nCurChar > 0)
             {
-              DeleteCharFromBuffer(pchInputBuf, -nCurChar, cch--);
+              DeleteCharFromBuffer(pchInputBuf, --nCurChar, cch--);
               GetCaretPosFromIndex(nCurChar, pchInputBuf, &nCaretPosX, &nCaretPosY);
             }
           break;
-        case 0x09:  /* 制表字符 */
+        case VK_TAB:   /* 制表字符 */
           /* 把制表符转换为  8 个连续空格字符 */
           for (i = 0; i < 8; i++)
-            SendMessage(hwndMain, WM_CHAR, 0x20, 0);
+            SendMessage(hwndMain, WM_CHAR, VK_SPACE/*0x20*/, 0);
           return 0;
-        case 0x0D:  /* 回车换行字符  */
+        case VK_RETURN: //0x0D:  /* 回车换行字符  */
           /* 记录回车换行符，并把插入符定位到下一新行的起始处 */
-          InsertCharToBuffer(0x0D, pchInputBuf, nCurChar++, cch++);
+          InsertCharToBuffer(VK_RETURN, pchInputBuf, nCurChar++, cch++);
           nCaretPosX = 0;
           nCaretPosY += 1;
           break;
@@ -248,9 +248,9 @@ LRESULT APIENTRY MainWndProc(HWND hwndMain,
         case VK_INSERT:
           fInsert = !fInsert;
           if(fInsert)
-            SetWindowText(hwndMain, "键盘输入示范程序   [输入]");
+            SetWindowText(hwndMain, TEXT("键盘输入示范程序   [输入]"));
           else
-            SetWindowText(hwndMain, "键盘输入示范程序   [改写]");
+            SetWindowText(hwndMain, TEXT("键盘输入示范程序   [改写]"));
           break;
         default:
           break;

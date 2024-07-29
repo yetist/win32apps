@@ -1,5 +1,7 @@
 project('key', 'c')
 
+add_project_arguments(['-DUNICODE'], language: 'c')
+
 win = import('windows')
 
 res = win.compile_resources('key.rc',
