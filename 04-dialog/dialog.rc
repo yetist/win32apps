@@ -1,0 +1,56 @@
+/* vi: set sw=4 ts=4 expandtab: */
+#include <windows.h>
+#include "dialog.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+// Icon
+DIALOGICON      ICON DISCARDABLE  "rcIcon.ico"
+DIALOGSMALLICON ICON DISCARDABLE  "Small.ico"
+
+// Menu
+DIALOGMENU MENU DISCARDABLE
+  BEGIN
+  POPUP "选项(&O)"
+  BEGIN
+    MENUITEM "打开模式对话框(&M)...",     IDM_OPENMODEL
+    MENUITEM "打开无模式对话框(&L)...",   IDM_OPENMODELESS
+    MENUITEM SEPARATOR
+    MENUITEM "退出(&X)",                  IDM_EXIT
+  END
+  POPUP "帮助(&H)"
+  BEGIN
+    MENUITEM "关于(&A)...\tF1",           IDM_ABOUT
+  END
+END
+
+// Dialog
+ABOUTBOX DIALOG DISCARDABLE 20, 25, 114, 77
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "关于对话框示范程序"
+FONT 14, "隶书_GB2312"
+BEGIN
+    PUSHBUTTON    "确定",           IDOK,       43, 51, 40, 14
+    CTEXT         "对话框示范程序", IDC_STATIC, 22, 9, 92, 8
+    CTEXT         "XXX编写",        IDC_STATIC, 30, 24, 76, 10, NOT WS_GROUP
+    CTEXT         "一九九六年八月", IDC_STATIC, 36, 37, 65, 8,  NOT WS_GROUP
+    ICON          "DialogICON",     IDC_STATIC, 11, 23, 18, 20
+    CONTROL       "",               IDC_STATIC, "Static", SS_BLACKFRAME, 40, 34, 56, 1
+END
+
+
+TEXTBOX DIALOG DISCARDABLE 5, 28, 162, 85
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "文字选项对话框"
+FONT 14, "仿宋_GB2312"
+BEGIN
+    DEFPUSHBUTTON "确定",       IDOK,       21, 61, 50, 14
+    PUSHBUTTON    "取消",       IDCANCEL,   88, 61, 50, 14
+    CONTROL       "红色(&R)",   IDD_RED,    "Button", BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP, 21, 22, 39, 10
+    CONTROL       "蓝色(&B)",   IDD_BLUE,   "Button", BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP, 21, 35, 39, 10
+    GROUPBOX      "文字颜色",   IDC_STATIC, 7, 9, 60, 44
+    CHECKBOX      "天上有个太阳", IDD_DAY,  84, 22, 64, 10
+    CONTROL       "水中有个月亮", IDD_NIGHT, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 84, 36, 64, 10
+    GROUPBOX      "文字内容", IDC_STATIC,   75, 9, 76, 41
+END
