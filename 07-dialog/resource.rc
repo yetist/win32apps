@@ -1,0 +1,30 @@
+/* vi: set sw=4 ts=4 expandtab ai: */
+#include <windows.h>
+#include "resource.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+// Dialog
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 309, 90
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定", IDOK, 198, 69, 50, 14
+    PUSHBUTTON      "取消", IDCANCEL, 252, 69, 50, 14
+    PUSHBUTTON      "ButtonHello", IDC_BUTTON_HELLO, 87, 39, 87, 15
+END
+
+IDD_FORMVIEW DIALOG DISCARDABLE  0, 0, 358, 162
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "表单测试", IDC_STATIC, 41,7,32,8
+    EDITTEXT        IDC_EDIT1,  41,21,91,14,ES_AUTOHSCROLL
+    CONTROL         "复选框",   IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,41,44,41,10
+    ICON            IDR_MAINFRAME,IDC_STATIC,7,7,21,20
+END
+
+// icon
+IDI_APP     ICON DISCARDABLE  "app.ico"
