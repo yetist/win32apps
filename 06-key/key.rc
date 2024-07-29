@@ -1,0 +1,40 @@
+/* vi: set sw=4 ts=4 expandtab ai: */
+#include <windows.h>
+#include "key.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+// Icon
+KEYINPUTICON	    ICON	DISCARDABLE   "resources/key.ico"
+KEYINPUTSMALLICON   ICON	DISCARDABLE   "resources/small.ico"
+
+// Menu
+KEYINPUTMENU MENU DISCARDABLE
+BEGIN
+  POPUP "文件(&F)"
+  BEGIN
+    MENUITEM "退出(&X)",                IDM_EXIT
+  END
+  POPUP "帮助(&H)"
+  BEGIN
+    MENUITEM "关于(&A)...\tF1",         IDM_ABOUT
+  END
+END
+
+// Dialog
+ABOUTBOX DIALOG DISCARDABLE 20,25,124, 77
+STYLE DS_MODALFRAME | WS_POPUP |WS_VISIBLE |WS_CAPTION | WS_SYSMENU
+CAPTION "关于键盘输入示范程序"
+FONT 14, "隶书_GB2312"
+BEGIN
+  PUSHBUTTON  "确定",             IDOK,        43, 51, 40, 14
+  CTEXT       "键盘输入示范程序", IDC_STATIC,  22, 9, 92, 8
+  CTEXT       "XXX编写",          IDC_STATIC,  30, 24, 76, 10,  NOT WS_GROUP
+  CTEXT       "一九九六年八月",   IDC_STATIC,  36, 37, 65, 8,   NOT WS_GROUP
+  ICON        "KeyInputIcon",     IDC_STATIC,  11, 23, 18, 20
+  CONTROL     "",                 IDC_STATIC, "Static", SS_BLACKFRAME, 40, 34, 56, 1
+END
+
+//Bitmap
+CARET BITMAP DISCARDABLE "resources/caret.bmp"
