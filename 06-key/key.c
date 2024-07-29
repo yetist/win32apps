@@ -81,7 +81,6 @@ LRESULT APIENTRY MainWndProc(HWND hwndMain,
   static DWORD dwCharY;
   static DWORD dwClientX;
   static DWORD dwClientY;
-  static DWORD dwLines;
   static int nCaretPosX = 0;
   static int nCaretPosY = 0;
   static int nCharWidth = 0;
@@ -120,14 +119,11 @@ LRESULT APIENTRY MainWndProc(HWND hwndMain,
       /* 保存客户区的新的宽度和高度 */
       dwClientX = LOWORD(lParam);
       dwClientY = HIWORD(lParam);
-
-      /*计算客户区的最大行数*/
-      dwLines = dwClientY / dwCharY;
       break;
     case WM_SETFOCUS:
       /* 当窗口拥有键盘输入焦点时，创建、定位并显示插入符 */
       /* 装入应用程序定义的插入符位图资源 */
-      hBmpCaret = LoadBitmap(hInst, "Caret");
+      hBmpCaret = (HWND) LoadBitmap(hInst, "Caret");
       /* 创建插入符 */
       CreateCaret(hwndMain, (HBITMAP) hBmpCaret, 0, 0);
       /* 调整插入符的位置 */
