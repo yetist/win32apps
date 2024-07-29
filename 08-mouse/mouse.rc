@@ -1,0 +1,45 @@
+/* vi: set sw=4 ts=4 expandtab: */
+#include <windows.h>
+#include "mouse.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+// Icon
+MOUSEICON      ICON DISCARDABLE  "mouse.ico"
+MOUSESMALLICON ICON DISCARDABLE  "small.ico"
+
+// Menu
+MOUSEMENU MENU DISCARDABLE
+  BEGIN
+  POPUP "文件(&F)"
+  BEGIN
+    MENUITEM "退出(&X)",              IDM_EXIT
+  END
+  POPUP "帮助(&H)"
+  BEGIN
+    MENUITEM "关于(&A)...",           IDM_ABOUT
+  END
+END
+
+// Dialog
+ABOUTBOX DIALOG DISCARDABLE 20, 25, 124, 77
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "关于鼠标测试示范程序"
+FONT 12, "宋体"
+BEGIN
+    PUSHBUTTON    "确定",             IDOK,       43, 51, 40, 14
+    CTEXT         "鼠标测试示范程序", IDC_STATIC, 22, 9, 92, 8
+    CTEXT         "XXX编写",          IDC_STATIC, 30, 24, 76, 10, NOT WS_GROUP
+    CTEXT         "一九九六年八月",   IDC_STATIC, 36, 37, 65, 8,  NOT WS_GROUP
+    ICON          "MOUSEICON",        IDC_STATIC, 11, 23, 18, 20
+    CONTROL       "",                 IDC_STATIC, "Static", SS_BLACKFRAME, 40, 34, 56, 1
+END
+
+// Cursor
+
+RCCURSOR    CURSOR  DISCARDABLE "rcCursor.cur"
+
+// Bitmap
+SUN         BITMAP  DISCARDABLE "sun.bmp"
+MOON        BITMAP  DISCARDABLE "moon.bmp"
