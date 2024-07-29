@@ -1,0 +1,66 @@
+/* vi: set sw=4 ts=4 expandtab: */
+#include <windows.h>
+#include "menu.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+/* Menu */
+MENUAPPMENU MENU DISCARDABLE
+BEGIN
+    MENUITEM "退出(&X)",                      IDM_EXIT
+    POPUP "编辑(&E)"
+    BEGIN
+        MENUITEM "撤消(&U)\tCtrl+Z",          IDM_EDITUNDO,GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "剪切(&T)\tCtrl+X",          IDM_EDITCUT
+        MENUITEM "复制(&T)\tCtrl+C",          IDM_EDITCOPY
+        MENUITEM "粘贴(&P)\tCtrl+V",          IDM_EDITPASTE
+        MENUITEM "删除(&D)\tDel",             IDM_EDITDELETE
+        MENUITEM SEPARATOR
+        MENUITEM "全部选中(&A)\tCtrl+A",      IDM_EDITSELECTALL
+    END
+    POPUP "查看(&V)"
+    BEGIN
+        MENUITEM "工具栏(&T)",                IDM_SHOWTOOLBAR
+        MENUITEM "状态栏(&S)",                IDM_SHOWSTATUSBAR
+    END
+    POPUP "字体(&T)"
+    BEGIN
+        MENUITEM "选择字体(&F)...\tCtrl+F",   IDM_SELECTFONTFACE
+        POPUP "选择字体风格(&S)"
+        BEGIN
+        MENUITEM  "粗体(&B)",                 IDM_BOLD
+        MENUITEM  "斜体(&I)",                 IDM_ITALIC
+        MENUITEM  "加下划线(&U)",             IDM_UNDERLINE
+        MENUITEM  "加删除线(&S)",             IDM_STRIKEOUT
+        END
+        POPUP "设置字体尺寸(&Z)"
+        BEGIN
+        MENUITEM  "小号字体(&S)",             IDM_SMALLFONTSIZE
+        MENUITEM  "中号字体(&M)",             IDM_NORMALFONTSIZE
+        MENUITEM  "大号字体(&L)",             IDM_LARGEFONTSIZE
+        END
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+    MENUITEM  "关于(&A)...\tF1",              IDM_ABOUT
+    END
+END
+
+/* Icon */
+MENUAPPICON     ICON    DISCARDABLE           "Menu.ico"
+SMALLICON       ICON    DISCARDABLE           "Small.ico"
+
+/* Accelerator */
+MENUAPPACCEL ACCELERATORS DISCARDABLE
+BEGIN
+    "A",        IDM_EDITSELECTALL,    VIRTKEY, CONTROL, NOINVERT
+    "C",        IDM_EDITCOPY,         VIRTKEY, CONTROL, NOINVERT
+    "V",        IDM_EDITPASTE,        VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,  IDM_EDITDELETE,       VIRTKEY, NOINVERT
+    VK_F1,      IDM_ABOUT,            VIRTKEY, NOINVERT
+    "X",        IDM_EDITCUT,          VIRTKEY, CONTROL, NOINVERT
+    "Z",        IDM_EDITUNDO,         VIRTKEY, CONTROL, NOINVERT
+    "^F",       IDM_SELECTFONTFACE,   ASCII, NOINVERT
+END
