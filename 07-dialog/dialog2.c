@@ -27,7 +27,8 @@ int WINAPI WinMain(HINSTANCE hThisApp, HINSTANCE hPrevApp, LPSTR lpCmd, int nSho
   wc.style = CS_HREDRAW | CS_VREDRAW;
   RegisterClass(&wc);
   // 创建窗口
-  hwnd = CreateWindow(TEXT("supper_man"), TEXT("超级应用"), WS_OVERLAPPEDWINDOW, 40, 25, 380, 300, NULL, NULL, hThisApp, NULL);
+  // WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX 不可改变窗口大小
+  hwnd = CreateWindow(TEXT("supper_man"), TEXT("超级应用"), WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, 40, 25, 380, 300, NULL, NULL, hThisApp, NULL);
   if(!hwnd)
 	return 0;
   ShowWindow(hwnd, nShow);
@@ -47,7 +48,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 		{
-		  // 创建对话框
+		  // 创建无模式对话框
 		  HWND hdlg = CreateDialog(hgAppInst, MAKEINTRESOURCE(IDD_FORMVIEW), hwnd, (DLGPROC)DlgProc);
 		  // 显示对话框
 		  ShowWindow(hdlg, SW_SHOWNA);

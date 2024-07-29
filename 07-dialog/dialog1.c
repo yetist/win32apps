@@ -17,6 +17,7 @@ int WINAPI WinMain(HINSTANCE hThisApp, HINSTANCE hPrevApp, LPSTR lpCmd, int nSho
   MSG msg;
   HWND hdlg;
 
+  // 创建无模式对话框
   hdlg = CreateDialog(hThisApp, MAKEINTRESOURCE(IDD_DIALOG_MAIN),GetDesktopWindow(),(DLGPROC)DlgProc);
   if(!hdlg) {
       return 0;
