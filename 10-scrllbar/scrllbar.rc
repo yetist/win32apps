@@ -1,0 +1,55 @@
+#include <windows.h>
+#include "scrllbar.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+// Icon
+SCROLLBARICON               ICON        DISCARDABLE     "scrllbar.ico"
+
+// Menu
+SCROLLBARMENU   MENU DISCARDABLE
+BEGIN
+    POPUP "选项(&O)"
+    BEGIN
+        MENUITEM "颜色设置(&C)...",     IDM_RGB
+        MENUITEM SEPARATOR
+        MENUITEM "退出(&X)",            IDM_EXIT
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "关于(&A)...",     IDM_ABOUT
+    END
+END
+
+// Dialog
+ABOUTBOX DIALOG DISCARDABLE 20, 25, 124, 77
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "关于使用滚动条的示范程序"
+FONT 14, "隶书_GB2312"
+BEGIN
+    PUSHBUTTON    "确定",               IDOK,       43, 51, 40, 14
+    CTEXT         "滚动条示范程序",     IDC_STATIC, 4, 9, 115, 8
+    CTEXT         "XXX编写",            IDC_STATIC, 30, 24, 76, 10, NOT WS_GROUP
+    CTEXT         "一九九六年八月",     IDC_STATIC, 36, 37, 65, 8,  NOT WS_GROUP
+    ICON          "SCROLLBARICON",      IDC_STATIC, 11, 23, 18, 20
+    CONTROL       "",                   IDC_STATIC, "Static", SS_BLACKFRAME, 40, 34, 56, 1
+END
+
+RGBDLG DIALOG DISCARDABLE 10, 80, 132, 73
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "颜色设置"
+FONT 10, "宋体"
+BEGIN
+    DEFPUSHBUTTON "确定",               IDOK,       18, 53, 36, 14
+    PUSHBUTTON    "取消",               IDCANCEL,   81, 53, 35, 14
+    SCROLLBAR                           IDC_RED,    36, 10, 69, 8, WS_TABSTOP
+    SCROLLBAR                           IDC_GREEN,  36, 25, 69, 8, WS_TABSTOP
+    SCROLLBAR                           IDC_BLUE,   36, 39, 69, 8, WS_TABSTOP
+    LTEXT         "红",                 IDC_STATIC, 14, 10, 15, 10
+    LTEXT         "绿",                 IDC_STATIC, 14, 24, 15, 10
+    LTEXT         "蓝",                 IDC_STATIC, 14, 38, 15, 10
+    LTEXT         "0",                  IDC_VALRED, 107, 9, 23, 10
+    LTEXT         "0",                  IDC_VALGREEN, 107, 24, 23, 10
+    LTEXT         "0",                  IDC_VALBLUE, 107, 39, 23, 10
+END
