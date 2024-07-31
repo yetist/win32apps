@@ -45,7 +45,7 @@ LOGFONT LogFont = { -18, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
     CLIP_DEFAULT_PRECIS,
     DEFAULT_QUALITY,
     DEFAULT_PITCH | FF_DONTCARE,
-    "abc"
+    TEXT("abc")
 };
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -114,9 +114,9 @@ LRESULT APIENTRY MainWndProc(HWND hWnd,
                              WPARAM wParam,
                              LPARAM lParam)
 {
-    static CHAR szBuf[128];
+    static TCHAR szBuf[128];
     HDC hDC;
-    HFONT hFont;
+    HFONT hFont = NULL;
     static int nCurSize;
     UINT uItem;
     RECT Rect;
@@ -136,7 +136,7 @@ LRESULT APIENTRY MainWndProc(HWND hWnd,
             FillMenu(hWnd);
 
             // 确定初始字体的字样
-            lstrcpy(LogFont, lfFaceName, pArrayOfTTFInfo[0].plf -> lfFaceName);
+            lstrcpy(LogFont.lfFaceName, pArrayOfTTFInfo[0].plf -> lfFaceName);
             ReleaseDC(hWnd, hDC);
             }
         break;
@@ -147,19 +147,19 @@ LRESULT APIENTRY MainWndProc(HWND hWnd,
         uItem = LOWORD(wParam);
         switch(uItem) {
           case IDM_SELECTFONTFACE:
-            DialogBox(hInst, "SelectFontFaceDlgBox", hWnd, (DLGPROC)
+            DialogBox(hInst, TEXT("SelectFontFaceDlgBox"), hWnd, (DLGPROC)
                       SelectFontFaceDlgProc);
             break;
-          case IDM_SELECTFONTFACE:
-            DialogBox(hInst, "SelectFontStyleDlgBox", hWnd, (DLGPROC)
+          case IDM_SELECTFONTSTYLE:
+            DialogBox(hInst, TEXT("SelectFontStyleDlgBox"), hWnd, (DLGPROC)
                       SelectFontStyleDlgProc);
             break;
           case IDM_SELECTFONTORIENT:
-            DialogBox(hInst, "SelectFontOrientDlgBox", hWnd, (DLGPROC)
+            DialogBox(hInst, TEXT("SelectFontOrientDlgBox"), hWnd, (DLGPROC)
                       SelectFontOrientDlgProc);
             break;
           case IDM_SELECTFONTCOLOR:
-            DialogBox(hInst, "SelectFontColorDlgBox", hWnd, (DLGPROC)
+            DialogBox(hInst, TEXT("SelectFontColorDlgBox"), hWnd, (DLGPROC)
                       SelectFontColorDlgProc);
             break;
           case IDM_NULL:
@@ -193,13 +193,13 @@ LRESULT APIENTRY MainWndProc(HWND hWnd,
 
             // 采用新选择的字体来显示文字
             SelectObject(hDC, hFont);
-            SetTextColor(hDc, crTextColor);
+            SetTextColor(hDC, crTextColor);
 
-            sprintf(szBuf, "系统中共安装有 %d 种 TrueType 字体", nFaces);
-            TextOut(hDc, 10, 150, szBuf, strlen(szBuf));
+            _swprintf(szBuf, TEXT("系统中共安装有 %d 种 TrueType 字体"), nFaces);
+            TextOut(hDC, 10, 150, szBuf, wcslen(szBuf));
 
-            sprintf(szBuf, "当前采用的字体是 %s", LogFont.lfFaceName);
-            TextOut(hDc, 10, 10, szBuf, strlen(szBuf));
+            _swprintf(szBuf, TEXT("当前采用的字体是 %s"), LogFont.lfFaceName);
+            TextOut(hDC, 10, 10, szBuf, wcslen(szBuf));
 
             ReleaseDC(hWnd, hDC);
         }
@@ -246,7 +246,7 @@ int APIENTRY MyEnumFontFacesProc(LPLOGFONT lpLogFont,
         pArrayOfTTFInfo[iFace].ptm = (LPTEXTMETRIC) LocalAlloc(LPTR, sizeof(TEXTMETRIC));
 
         if ((pArrayOfTTFInfo[iFace].plf == NULL) || (pArrayOfTTFInfo[iFace].ptm == NULL)) {
-            MessageBox(NULL, "内存分配失败", NULL, MB_OK);
+            MessageBox(NULL, TEXT("内存分配失败"), NULL, MB_OK);
             return FALSE;
         }
 
@@ -271,56 +271,363 @@ int APIENTRY MyEnumFontCountProc(LPLOGFONT lpLogFont,
 VOID FillMenu(HWND hWnd)
 {
     int idx;
-    char szSize[10];
+    TCHAR szSize[10];
     HMENU hMenuMain;
     HMENU hMenuSize;
 
     hMenuMain = GetMenu(hWnd);
 
     hMenuSize = CreatePopupMenu();
-    //TODO: pg283
+    InsertMenu(hMenuMain, (UINT) 2, MF_BYPOSITION | MF_STRING | MF_POPUP,
+               (UINT_PTR) hMenuSize, TEXT("尺寸(&Z)"));
 
-
-    break;
-  case WM_LBUTTONDBLCLK:
-  case WM_RBUTTONDBLCLK:
-    /* 如果鼠标双击了窗口客户区，那么就地显示坐标信息 */
-    hdc = GetDC(hWnd);
-
-    SetTextColor(hdc, (message == WM_LBUTTONDBLCLK) ? RGB(255, 0, 0) : RGB(0, 0, 255));
-    wsprintf(szTitle, TEXT("(%d, %d)"), LOWORD(lParam), HIWORD(lParam));
-    TextOut(hdc, LOWORD(lParam), HIWORD(lParam), szTitle, lstrlen(szTitle));
-
-    ReleaseDC(hWnd, hdc);
-    break;
-
-  case WM_PAINT:
-    hdc = BeginPaint(hWnd, &ps);
-
-    hMemDc = CreateCompatibleDC(hdc);
-    SelectObject(hMemDc, hSun);
-    BitBlt(hdc, 90, 8, 48, 48, hMemDc, 0, 0, SRCCOPY);
-    DeleteDC(hMemDc);
-
-    hMemDc = CreateCompatibleDC(hdc);
-    SelectObject(hMemDc, hMoon);
-    BitBlt(hdc, 90, 78, 48, 48, hMemDc, 0, 0, SRCCOPY);
-    DeleteDC(hMemDc);
-
-    EndPaint(hWnd, &ps);
-    break;
-
-  case WM_DESTROY:
-    DeleteObject(hSun);
-    DeleteObject(hMoon);
-    PostQuitMessage(0);
-    break;
-  default:
-    // 调用默认窗口过程对未处理的消息进行必要的处理
-    return DefWindowProc(hWnd, message, wParam, lParam);
+    for(idx = 0; idx < NUM_POINTS; idx++) {
+        wsprintf(szSize, TEXT("%d"), aPoints[idx]);
+        AppendMenu(hMenuSize, MF_STRING | MF_UNCHECKED, IDM_SIZE + idx,
+                    (LPCWSTR) szSize);
+    }
 }
 
-return 0;
+BOOL APIENTRY SelectFontFaceDlgProc(HWND hDlg, UINT message, WPARAM wParam,
+                                    LPARAM lParam)
+{
+    TCHAR szFontFaceName[LF_FACESIZE];;
+    int  nItem;
+    int idx;
+    static int  nCurrentFont = 0;
+
+    switch(message) {
+        case WM_INITDIALOG:
+          for(idx = 0; idx < nFaces;  idx ++) {
+              SendMessage(GetDlgItem(hDlg, IDL_FONTFACE), LB_ADDSTRING, 0,
+                          (LPARAM) (LPCTSTR) pArrayOfTTFInfo[idx].plf ->
+                          lfFaceName);
+          }
+
+          SendMessage(GetDlgItem(hDlg,  IDL_FONTFACE), LB_SELECTSTRING,
+                      (WPARAM) -1, (LPARAM) (LPCTSTR)
+                      pArrayOfTTFInfo[nCurrentFont].plf -> lfFaceName);
+          SetFocus(GetDlgItem(hDlg, IDL_FONTFACE));
+          return TRUE;
+        case WM_COMMAND:
+          switch(LOWORD(wParam)) {
+            case LBN_SELCHANGE:
+            {
+                  nItem = SendMessage(GetDlgItem(hDlg, IDL_FONTFACE),
+                                      LB_GETCURSEL, 0, 0);
+                  SendMessage(GetDlgItem(hDlg, IDL_FONTFACE),
+                              LB_GETTEXT, nItem, (LPARAM)
+                              szFontFaceName);
+
+                  for(idx = 0; wcscmp(szFontFaceName, pArrayOfTTFInfo[idx].plf ->
+                                      lfFaceName); idx++);
+
+                  if(idx < nFaces) {
+                      nCurrentFont = idx;
+                  }
+                  HFONT hFontSample;
+
+                  hFontSample  =  CreateFont(-28, 0, 0, 0, FW_NORMAL, FALSE,
+                                               FALSE, FALSE,
+                                               pArrayOfTTFInfo[nCurrentFont].plf->lfCharSet,
+                                               pArrayOfTTFInfo[nCurrentFont].plf->lfOutPrecision,
+                                               pArrayOfTTFInfo[nCurrentFont].plf->lfClipPrecision,
+                                               pArrayOfTTFInfo[nCurrentFont].plf->lfQuality,
+                                               pArrayOfTTFInfo[nCurrentFont].plf->lfPitchAndFamily,
+                                               pArrayOfTTFInfo[nCurrentFont].plf->lfFaceName);
+
+                  SendDlgItemMessage(hDlg, IDC_FONTSAMPLE, WM_SETFONT,
+                                     (WPARAM) hFontSample, 0L);
+                  SetDlgItemText(hDlg, IDC_FONTSAMPLE,
+                                  pArrayOfTTFInfo[nCurrentFont].plf ->
+                                  lfFaceName);
+                  DeleteObject(hFontSample);
+                return TRUE;
+            }
+            case LBN_DBLCLK:
+                nItem = SendMessage(GetDlgItem(hDlg, IDL_FONTFACE),
+                                    LB_GETCURSEL, 0, 0);
+                SendMessage(GetDlgItem(hDlg, IDL_FONTFACE), LB_GETTEXT, nItem,
+                            (LPARAM) szFontFaceName);
+
+                for(idx = 0; wcscmp(szFontFaceName, pArrayOfTTFInfo[idx].plf ->
+                                    lfFaceName); idx++);
+
+                if(idx < nFaces)
+                    nCurrentFont = idx;
+
+                lstrcpy(LogFont.lfFaceName, pArrayOfTTFInfo[nCurrentFont].plf ->
+                        lfFaceName);
+                EndDialog(hDlg, TRUE);
+
+                return TRUE;
+          }
+          break;
+        case IDOK:
+          lstrcpy(LogFont.lfFaceName, pArrayOfTTFInfo[nCurrentFont].plf ->
+                  lfFaceName);
+          EndDialog(hDlg, TRUE);
+          return TRUE;
+        case IDCANCEL:
+          EndDialog(hDlg, FALSE);
+          return TRUE;
+        default:
+          return FALSE;
+    }
+    return FALSE;
+}
+
+BOOL APIENTRY SelectFontStyleDlgProc(HWND hDlg, UINT message, WPARAM wParam,
+                                    LPARAM lParam)
+{
+    HWND hListBox;
+    TCHAR szFontFaceStyle[4][10] = {L"粗体", L"斜体", L"加下划线", L"加删除线"};
+    int idx;
+    static BOOL bBold = FALSE, bItalic = FALSE, bUnderLine = FALSE, StrikeOut =
+      FALSE;
+
+    switch(message) {
+      case WM_INITDIALOG:
+          for(idx = 0; idx < 4;  idx ++) {
+              SendMessage(GetDlgItem(hDlg, IDL_FONTSTYLE), LB_ADDSTRING, 0,
+                          (LPARAM) (LPCSTR) szFontFaceStyle[idx]);
+          }
+
+          SetFocus(GetDlgItem(hDlg, IDL_FONTSTYLE));
+
+          if(bBold)
+              SendMessage(GetDlgItem(hDlg,  IDL_FONTSTYLE),
+                          LB_SELITEMRANGE, (WPARAM) TRUE, MAKELPARAM(0,0));
+          if(bItalic)
+              SendMessage(GetDlgItem(hDlg,  IDL_FONTSTYLE),
+                          LB_SELITEMRANGE, (WPARAM) TRUE, MAKELPARAM(1,1));
+          if(bUnderLine)
+              SendMessage(GetDlgItem(hDlg,  IDL_FONTSTYLE),
+                          LB_SELITEMRANGE, (WPARAM) TRUE, MAKELPARAM(2,2));
+          if(StrikeOut)
+              SendMessage(GetDlgItem(hDlg,  IDL_FONTSTYLE),
+                          LB_SELITEMRANGE, (WPARAM) TRUE, MAKELPARAM(3,3));
+
+          return TRUE;
+      case WM_COMMAND:
+          switch(LOWORD(wParam)) {
+            case IDOK:
+              hListBox = GetDlgItem(hDlg, IDL_FONTSTYLE);
+              bBold = (SendMessage(hListBox, LB_GETSEL,
+                                   (WPARAM) 0, (LPARAM) 0) > 0) ? TRUE : FALSE;
+              LogFont.lfWeight = bBold ? FW_BOLD : FW_NORMAL;
+
+              bItalic = (SendMessage(hListBox, LB_GETSEL,
+                                   (WPARAM) 1, (LPARAM) 0) > 0) ? TRUE : FALSE;
+              LogFont.lfItalic = bItalic;
+
+              bUnderLine = (SendMessage(hListBox, LB_GETSEL,
+                                   (WPARAM) 2, (LPARAM) 0) > 0) ? TRUE : FALSE;
+              LogFont.lfUnderline = bUnderLine;
+
+              StrikeOut = (SendMessage(hListBox, LB_GETSEL, (WPARAM) 3, (LPARAM) 0) > 0) ? TRUE : FALSE;
+              LogFont.lfStrikeOut = StrikeOut;
+
+              EndDialog(hDlg, TRUE);
+
+              return TRUE;
+            case IDCANCEL:
+              EndDialog(hDlg, FALSE);
+              return TRUE;
+            default:
+              return FALSE;
+          }
+    }
+    return FALSE;
 }
 
 
+BOOL APIENTRY SelectFontOrientDlgProc(HWND hDlg, UINT message, WPARAM wParam,
+                                    LPARAM lParam)
+{
+    TCHAR szFontOrientation[20];
+    int idx;
+    int nSelItem;
+    static int nCurFontOrientation = 0;
+
+    switch(message) {
+      case WM_INITDIALOG:
+        for (idx = 0; idx < 360; idx+=5) {
+            wsprintf(szFontOrientation, TEXT("倾斜 %d 度"), (idx <= 180) ? idx : (idx - 360));
+
+            SendMessage(GetDlgItem(hDlg, IDL_FONTORIENT), LB_ADDSTRING,
+                        0, (LPARAM) (LPCSTR) szFontOrientation);
+
+        }
+
+        SetFocus(GetDlgItem(hDlg, IDL_FONTORIENT));
+
+        wsprintf(szFontOrientation, TEXT("倾斜 %d 度"),
+                (nCurFontOrientation <= 180) ? nCurFontOrientation :
+                (nCurFontOrientation - 360));
+        SendMessage(GetDlgItem(hDlg, IDL_FONTORIENT), LB_SELECTSTRING,
+                    (WPARAM) -1, (LPARAM) (LPCSTR) szFontOrientation);
+        return TRUE;
+      case WM_COMMAND:
+        switch(LOWORD(wParam)) {
+          case IDOK:
+          case IDL_FONTFACE:
+            if(LOWORD(wParam) == IDOK || HIWORD(wParam) == LBN_DBLCLK) {
+                nSelItem = SendMessage(GetDlgItem(hDlg, IDL_FONTORIENT),
+                                       LB_GETCURSEL, 0, 0);
+                nCurFontOrientation = nSelItem * 5;
+
+                LogFont.lfEscapement = LogFont.lfOrientation = nCurFontOrientation * 10;
+
+                EndDialog(hDlg, TRUE);
+                return TRUE;
+            }
+            break;
+          case IDCANCEL:
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+          default:
+            return FALSE;
+        }
+    }
+    return FALSE;
+}
+
+
+BOOL APIENTRY SelectFontColorDlgProc(HWND hDlg, UINT message, WPARAM wParam,
+                                    LPARAM lParam)
+{
+    LPDRAWITEMSTRUCT    lpdis;
+    LPMEASUREITEMSTRUCT lpmis;
+    TEXTMETRIC          tm;
+    int                 nItem;
+    COLORREF            crFontColor;
+    RECT                rect;
+    TCHAR               szItemString[10];
+    static HWND         hListBoxFontColor;
+    static int          nItemCurSel = 0;
+
+    switch(message) {
+      case WM_INITDIALOG:
+        hListBoxFontColor = GetDlgItem(hDlg, IDL_FONTCOLOR);
+        nItem = SendMessage(hListBoxFontColor, LB_ADDSTRING,
+                            0, (LPARAM) L"黑");
+        SendMessage(hListBoxFontColor, LB_SETITEMDATA, nItem,
+                    (LPARAM) RGB(0, 0, 0));
+        nItem = SendMessage(hListBoxFontColor, LB_ADDSTRING,
+                            0, (LPARAM) L"红");
+        SendMessage(hListBoxFontColor, LB_SETITEMDATA, nItem,
+                    (LPARAM) RGB(255, 0, 0));
+        nItem = SendMessage(hListBoxFontColor, LB_ADDSTRING,
+                            0, (LPARAM) L"绿");
+        SendMessage(hListBoxFontColor, LB_SETITEMDATA, nItem,
+                    (LPARAM) RGB(0, 255, 0));
+        nItem = SendMessage(hListBoxFontColor, LB_ADDSTRING,
+                            0, (LPARAM) L"蓝");
+        SendMessage(hListBoxFontColor, LB_SETITEMDATA, nItem,
+                    (LPARAM) RGB(0, 0, 255));
+        nItem = SendMessage(hListBoxFontColor, LB_ADDSTRING,
+                            0, (LPARAM) L"黄");
+        SendMessage(hListBoxFontColor, LB_SETITEMDATA, nItem,
+                    (LPARAM) RGB(255, 255, 0));
+        nItem = SendMessage(hListBoxFontColor, LB_ADDSTRING,
+                            0, (LPARAM) L"灰");
+        SendMessage(hListBoxFontColor, LB_SETITEMDATA, nItem,
+                    (LPARAM) RGB(150, 150, 150));
+
+        SendMessage(hListBoxFontColor, LB_SETCURSEL,
+                    (WPARAM) nItemCurSel, 0);
+        return TRUE;
+      case WM_DRAWITEM:
+        lpdis = (LPDRAWITEMSTRUCT) lParam;
+
+        if(lpdis -> itemID == -1) {
+            break;
+        }
+
+        switch (lpdis -> itemAction) {
+          case ODA_DRAWENTIRE:
+          case ODA_SELECT:
+            crFontColor = (COLORREF) SendMessage(lpdis -> hwndItem,
+                                                 LB_GETITEMDATA, lpdis->itemID,
+                                                 (LPARAM) 0);
+            rect.left = (lpdis -> rcItem).left +4;
+            rect.top = (lpdis -> rcItem).top + 4;
+            rect.right = (lpdis -> rcItem).right - 30;
+            rect.bottom = (lpdis -> rcItem).bottom - 4;
+
+            FillRect(lpdis -> hDC, (LPRECT) &rect,
+                     CreateSolidBrush(crFontColor));
+            SendMessage(lpdis -> hwndItem, LB_GETTEXT, lpdis ->itemID,
+                        (LPARAM) szItemString);
+            GetTextMetrics (lpdis -> hDC, &tm);
+            SetTextColor (lpdis -> hDC, crFontColor);
+
+            TextOut(lpdis -> hDC, rect.right +4,
+                    (lpdis -> rcItem.top + lpdis -> rcItem.bottom - tm.tmHeight)/2,
+                    szItemString,
+                    lstrlen(szItemString));
+
+            if(lpdis -> itemState & ODS_SELECTED) {
+                rect.left = (lpdis -> rcItem).left + 10;
+                rect.top = (lpdis -> rcItem).top + 10;
+                rect.right = (lpdis -> rcItem).right - 36;
+                rect.bottom = (lpdis -> rcItem).bottom - 10;
+
+                InvertRect(lpdis->hDC, (LPRECT) &rect);
+            }
+            break;
+          case ODA_FOCUS:
+            break;
+        }
+
+        /* 返回TRUE, 表示本过程已经处理了该条消息 */
+        return TRUE;
+        break;
+      case WM_MEASUREITEM:
+        lpmis = (LPMEASUREITEMSTRUCT) lParam;
+
+        lpmis -> itemHeight = 30;
+        break;
+      case WM_CLOSE:
+        EndDialog(hDlg, 0);
+        return TRUE;
+        break;
+      case WM_COMMAND:
+        switch(LOWORD(wParam)) {
+          case IDOK:
+            nItemCurSel = SendMessage(hListBoxFontColor,
+                                      LB_GETCURSEL, 0, 0);
+            crTextColor = (COLORREF) SendMessage(hListBoxFontColor,
+                                                 LB_GETITEMDATA, (WPARAM)
+                                                 nItemCurSel, 0);
+          case IDCANCEL:
+            EndDialog(hDlg, TRUE);
+            return TRUE;
+            break;
+          default:
+            return FALSE;
+            break;
+        }
+      default:
+        return FALSE;
+    }
+    return TRUE;
+}
+
+
+BOOL APIENTRY About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  switch(message) {
+    case WM_INITDIALOG:
+      return TRUE;
+    case WM_COMMAND:
+      if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+          EndDialog(hDlg, TRUE);
+          return TRUE;
+      }
+      break;
+  }
+
+  return FALSE;
+}

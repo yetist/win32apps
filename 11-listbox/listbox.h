@@ -43,6 +43,41 @@ typedef struct tagTrueTypeFontInfo {
     TEXTMETRIC      *ptm;
 } TRUETYPEFONTINFO, *PTRUETYPEFONTINFO;
 
-...
+
+LRESULT APIENTRY MainWndProc(HWND hWnd,
+                             UINT message,
+                             WPARAM wParam,
+                             LPARAM lParam);
+BOOL InitApplication(HINSTANCE hInstance);
+BOOL APIENTRY SelectFontFaceDlgProc(HWND hDlg, UINT message, WPARAM wParam,
+                                    LPARAM lParam);
+BOOL APIENTRY SelectFontStyleDlgProc(HWND hDlg, UINT message, WPARAM wParam,
+                                    LPARAM lParam);
+BOOL APIENTRY SelectFontOrientDlgProc(HWND hDlg, UINT message, WPARAM wParam,
+                                    LPARAM lParam);
+BOOL APIENTRY SelectFontColorDlgProc(HWND hDlg, UINT message, WPARAM wParam,
+                                    LPARAM lParam);
+
+
+
+int APIENTRY MyEnumFontFacesProc(LPLOGFONT lpLogFont,
+                                 LPTEXTMETRIC lpTEXTMETRICs,
+                                 DWORD fFontType,
+                                 LPVOID lpData);
+int APIENTRY MyEnumFontCountProc(LPLOGFONT lpLogFont,
+                                 LPTEXTMETRIC lpTEXTMETRICs,
+                                 DWORD fFontType,
+                                 LPINT lpData);
+
+
+BOOL InitApplication(HINSTANCE hInstance);
+BOOL InitInstance(HINSTANCE hInstance, int nCmdShow);
+PTRUETYPEFONTINFO BuildFontList(HDC hDCFont, LPINT retnFaces);
+
+VOID FillMenu(HWND hWnd);
+BOOL APIENTRY About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+
+
+
 #endif /* end of include guard __LISTBOX_H__ */
 
