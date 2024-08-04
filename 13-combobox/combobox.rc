@@ -1,9 +1,8 @@
 #include <windows.h>
-#include <winnls.h>
 #include "resource.h"
 
-/* UTF-8 */
-//#pragma code_page(CP_UTF8)
+/* UTF-8
+ * maybe mingw does not support code_page(CP_UTF8) style */
 #pragma code_page(65001)
 
 //Icon
