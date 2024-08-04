@@ -92,7 +92,7 @@ BOOL InitApplication(HINSTANCE hInstance)
     wcexComboBox.hbrBackground = GetStockObject (WHITE_BRUSH);
     wcexComboBox.lpszMenuName  = TEXT("EditBoxMenu");
     wcexComboBox.lpszClassName = TEXT("ComboBoxWClass");
-    wcexComboBox.hIconSm       = LoadIcon (hInstance, TEXT("Small"));
+    wcexComboBox.hIconSm       = LoadIcon (hInstance, TEXT("about"));
 
     return (RegisterClassEx (&wcexComboBox));
 }
@@ -101,7 +101,7 @@ BOOL InitInstance (HINSTANCE hInstance, int nCmdShow)
 {
     HWND hWnd;
     hInst = hInstance;
-    hWnd = CreateWindow(TEXT("ComboBox WClass"),
+    hWnd = CreateWindow(TEXT("ComboBoxWClass"),
                         TEXT("组合框示范程序"),
                         WS_OVERLAPPEDWINDOW,
                         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
@@ -175,7 +175,7 @@ LRESULT APIENTRY MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
             pArrayOfTTFInfo = BuildFontList (hDC, &nFaces);
             ReleaseDC(hWnd, hDC);
             lstrcpy (LogFont.lfFaceName, pArrayOfTTFInfo[0].plf->lfFaceName);
-            wsprintf(szFontString, L"现在采用的字体是%ls.", LogFont.lfFaceName);
+            wsprintf(szFontString, TEXT("现在采用的字体是%ls."), LogFont.lfFaceName);
             }
         break;
       case WM_SETFOCUS:
@@ -214,26 +214,26 @@ LRESULT APIENTRY MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
                 case CBN_SELCHANGE:
                       {
                       int iSelect;
-                      CHAR szFontSize[10];
+                      TCHAR szFontSize[10];
                       //检取当前选择的字体尺寸。
-                      iSelect = SendMessage(hWndComboBoxFontSize, CB_GETCURSEL,0,0);
-                      SendMessage (hWndComboBoxFontSize, CB_GETLBTEXT, (WPARAM) iSelect, (LPARAM) (LPCSTR) szFontSize);
-                      LogFont.lfHeight = -MulDiv (atoi (szFontSize), LogPixelSy, 72);
+                      iSelect = SendMessage(hWndComboBoxFontSize, CB_GETCURSEL, 0, 0);
+                      SendMessage (hWndComboBoxFontSize, CB_GETLBTEXT, (WPARAM) iSelect, (LPARAM) (LPCWSTR) szFontSize);
+                      LogFont.lfHeight = -MulDiv (_wtoi (szFontSize), LogPixelSy, 72);
                       }
                   break;
                   }
               break;
             case IDM_SELECTFONTFACE:
-              DialogBox (hInst, TEXT("SelectFontFaceDlgBox"), hWnd, (DLGPROC)SelectFontFaceDlgProc);
+              DialogBox (hInst, TEXT("SelectFontFaceDlgBox"), hWnd, (DLGPROC) SelectFontFaceDlgProc);
               break;
             case IDM_SELECTFONTSTYLE:
               DialogBox (hInst, TEXT("SelectFontStyleDlgBox"), hWnd, (DLGPROC) SelectFontStyleDlgProc);
               break;
             case IDM_SELECTFONTCOLOR:
-              DialogBox(hInst, TEXT("SelectFontColorDlgBox"), hWnd, (DLGPROC)SelectFontColorDlgProc);
+              DialogBox(hInst, TEXT("SelectFontColorDlgBox"), hWnd, (DLGPROC) SelectFontColorDlgProc);
               break;
             case IDM_SELECTFONTORIENT:
-              DialogBox (hInst, TEXT("SelectFontOrientDlgBox"), hWnd, (DLGPROC)SelectFontOrientDlgProc);
+              DialogBox (hInst, TEXT("SelectFontOrientDlgBox"), hWnd, (DLGPROC) SelectFontOrientDlgProc);
               break;
             case IDM_EXIT:
               SendMessage (hWnd, WM_CLOSE, 0, 0L);
@@ -304,7 +304,7 @@ LRESULT APIENTRY MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
           hWndComboBox = (GetFocus() == hWndEditTextString) ?  hWndComboBoxTextString : hWndComboBoxFontSize;
 
           /* 清除当前选择。*/
-          SendMessage (hWndComboBox, CB_SETCURSEL, (WPARAM)(-1),0);
+          SendMessage (hWndComboBox, CB_SETCURSEL, (WPARAM)(-1), 0);
 
           /*把输入焦点设置给主窗口。*/
           SetFocus (hWndMain);
@@ -331,7 +331,7 @@ LRESULT APIENTRY MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
                       dwIndex = SendMessage(hWndComboBox, CB_INSERTSTRING,
                                             (WPARAM) 0, (LPARAM) szItemText);
                   if (dwIndex != CB_ERR)
-                      SendMessage (hWndComboBox, CB_SETCURSEL, dwIndex,0);
+                      SendMessage (hWndComboBox, CB_SETCURSEL, dwIndex, 0);
 
                   if(hWndComboBox == hWndComboBoxFontSize) {
                       LogFont.lfHeight = -MulDiv (_wtoi (szItemText), LogPixelSy, 72);
@@ -352,21 +352,20 @@ LRESULT APIENTRY MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 VOID FillComboBox (void)
 {
     int idx;
-    TCHAR szTextColor[3][20] = {L"床前明月光", L"远上寒山石径斜", L"众里寻他千百度"};
+    TCHAR szTextColor[3][20] = {TEXT("床前明月光"), TEXT("远上寒山石径斜"), TEXT("众里寻他千百度")};
 
-    static int aPoints[NUM_POINTS] = {8, 9, 10, 11, 12, 14, 16, 18, 20,
-        22, 24, 26, 28, 36, 48, 72};
+    static int aPoints[NUM_POINTS] = {8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72};
     TCHAR szFontSize[10];
 
     /*把字体尺寸字符串插入到字体尺寸组合框中。*/
     for (idx = 0; idx < NUM_POINTS; idx++) {
-        wsprintf (szFontSize, TEXT("%d"), aPoints[idx]);
-        SendMessage (hWndComboBoxFontSize, CB_ADDSTRING,
-                     0, (LPARAM) (LPCWSTR) szFontSize);
+        wsprintf (szFontSize, TEXT("%ld"), aPoints[idx]);
+        SendMessage (hWndComboBoxFontSize, CB_ADDSTRING, 0,
+                     (LPARAM) (LPCSTR) szFontSize);
     }
     wsprintf(szFontSize, TEXT("%d"), aPoints[4]);
-    SendMessage (hWndComboBoxFontSize, WM_SETTEXT,
-                 0, (LPARAM) (LPCWSTR) szFontSize);
+    SendMessage (hWndComboBoxFontSize, WM_SETTEXT, 0,
+                 (LPARAM) (LPCWSTR) szFontSize);
 
     /* 把演示文字字符串插入到演示文字组合框中。*/
     for (idx = 0; idx < 3; idx++) {
@@ -404,12 +403,12 @@ BOOL APIENTRY SelectFontFaceDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
       case WM_COMMAND:
           switch (LOWORD(wParam)) {
               case IDC_FONTFACE:
-                if( HIWORD(wParam) != CBN_DBLCLK)
+                if(HIWORD(wParam) != CBN_DBLCLK)
                     break;
               case IDOK:
                      SendDlgItemMessage(hDlg, IDC_FONTFACE,
                                         WM_GETTEXT,
-                                        sizeof (LogFont.lfFaceName),
+                                        sizeof(LogFont.lfFaceName),
                                         (LPARAM)LogFont.lfFaceName);
                      EndDialog (hDlg, TRUE);
                      return (TRUE);
@@ -426,7 +425,7 @@ BOOL APIENTRY SelectFontFaceDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 BOOL APIENTRY SelectFontStyleDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HWND hListBox;
-    TCHAR szFontFaceStyle[4][10] = {L"粗体", L"斜体", L"加下划线", L"加删除线"};
+    TCHAR szFontFaceStyle[4][10] = {TEXT("粗体"), TEXT("斜体"), TEXT("加下划线"), TEXT("加删除线")};
     int idx;
     static BOOL bBold = FALSE, bItalic =FALSE, bUnderLine = FALSE,
                 bStrikeOut = FALSE;
@@ -434,13 +433,12 @@ BOOL APIENTRY SelectFontStyleDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
       case WM_INITDIALOG:
         for (idx=0; idx < 4; idx++) {
             SendMessage (GetDlgItem (hDlg, IDL_FONTSTYLE), LB_ADDSTRING,
-                         0, (LPARAM) (LPCSTR) szFontFaceStyle[idx]);
+                         0, (LPARAM) (LPCWSTR) szFontFaceStyle[idx]);
         }
         SetFocus (GetDlgItem (hDlg, IDL_FONTSTYLE));
         if(bBold)
             SendMessage (GetDlgItem (hDlg, IDL_FONTSTYLE),
-                         LB_SELITEMRANGE,
-                         (WPARAM) TRUE, MAKELPARAM(0,0));
+                         LB_SELITEMRANGE, (WPARAM) TRUE, MAKELPARAM(0,0));
         if(bItalic)
             SendMessage (GetDlgItem (hDlg, IDL_FONTSTYLE),
                          LB_SELITEMRANGE, (WPARAM) TRUE, MAKELPARAM(1,1));
@@ -450,7 +448,7 @@ BOOL APIENTRY SelectFontStyleDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
         if(bStrikeOut)
             SendMessage (GetDlgItem (hDlg, IDL_FONTSTYLE),
                          LB_SELITEMRANGE, (WPARAM) TRUE, MAKELPARAM(3,3));
-        return (TRUE);
+        return TRUE;
       case WM_COMMAND:
           switch(LOWORD(wParam)) {
             case IDOK:
@@ -471,15 +469,15 @@ BOOL APIENTRY SelectFontStyleDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
                                       (WPARAM) 3, (LPARAM) 0) > 0) ? TRUE : FALSE;
               LogFont.lfStrikeOut = bStrikeOut;
               EndDialog (hDlg, TRUE);
-              return (TRUE);
+              return TRUE;
             case IDCANCEL:
               EndDialog (hDlg, FALSE);
-              return (TRUE);
+              return TRUE;
             default:
-                return (FALSE);
+                return FALSE;
           }
     }
-    return (FALSE);
+    return FALSE;
 }
 
 /*
@@ -505,27 +503,27 @@ BOOL CALLBACK SelectFontColorDlgProc(HWND hDlg, UINT message,
       case WM_INITDIALOG:
         hComboBoxFontColor = GetDlgItem (hDlg, IDC_FONTCOLOR);
         nItem = SendMessage (hComboBoxFontColor, CB_ADDSTRING,
-                             0, (LPARAM)"黑");
+                             0, (LPARAM) TEXT("黑"));
         SendMessage (hComboBoxFontColor, CB_SETITEMDATA, nItem,
                      (LPARAM) RGB(0,0,0));
         nItem = SendMessage (hComboBoxFontColor, CB_ADDSTRING,
-                             0, (LPARAM)"红");
+                             0, (LPARAM) TEXT("红"));
         SendMessage (hComboBoxFontColor, CB_SETITEMDATA, nItem,
                      (LPARAM) RGB(255,0,0));
         nItem = SendMessage (hComboBoxFontColor, CB_ADDSTRING,
-                             0, (LPARAM)"绿");
+                             0, (LPARAM) TEXT("绿"));
         SendMessage (hComboBoxFontColor, CB_SETITEMDATA, nItem,
                      (LPARAM) RGB(0,255,0));
         nItem = SendMessage (hComboBoxFontColor, CB_ADDSTRING,
-                            0, (LPARAM)"蓝");
+                            0, (LPARAM) TEXT("蓝"));
         SendMessage (hComboBoxFontColor, CB_SETITEMDATA, nItem,
                      (LPARAM) RGB(0,0,255));
         nItem = SendMessage (hComboBoxFontColor, CB_ADDSTRING,
-                            0, (LPARAM)"黄");
+                            0, (LPARAM) TEXT("黄"));
         SendMessage (hComboBoxFontColor, CB_SETITEMDATA, nItem,
                      (LPARAM) RGB(255, 255,0));
         nItem = SendMessage (hComboBoxFontColor, CB_ADDSTRING,
-                             0, (LPARAM)"灰");
+                             0, (LPARAM) TEXT("灰"));
         SendMessage (hComboBoxFontColor, CB_SETITEMDATA, nItem,
                      (LPARAM) RGB(150, 150,150));
         SendMessage (hComboBoxFontColor, CB_SETCURSEL,
@@ -746,13 +744,13 @@ LRESULT CALLBACK SubClassProc(HWND hWnd,
       case WM_KEYDOWN:
           switch (wParam) {
             case VK_TAB:
-              SendMessage (hWndMain, WM_TAB,0,0);
+              SendMessage (hWndMain, WM_TAB, 0, 0);
               return 0;
             case VK_ESCAPE:
-              SendMessage (hWndMain, WM_ESC, 0,0);
+              SendMessage (hWndMain, WM_ESC, 0, 0);
               return 0;
             case VK_RETURN:
-              SendMessage (hWndMain, WM_ENTER,0,0);
+              SendMessage (hWndMain, WM_ENTER, 0, 0);
               break;
           }
           break;
@@ -767,6 +765,5 @@ LRESULT CALLBACK SubClassProc(HWND hWnd,
     }
 
     /*调用原有的窗口过程，对消息进行默认处理。*/
-    return CallWindowProc (lpfnEditWndProc, hWnd,
-                           message, wParam, lParam);
+    return CallWindowProc (lpfnEditWndProc, hWnd, message, wParam, lParam);
 }
