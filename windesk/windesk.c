@@ -88,6 +88,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         EndPaint (hwnd, &ps);
         return 0;
       case WM_DESTROY:
+        show_desktop();
         PostQuitMessage (0);
         return 0;
     }

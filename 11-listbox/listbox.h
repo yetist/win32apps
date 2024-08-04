@@ -77,7 +77,5 @@ PTRUETYPEFONTINFO BuildFontList(HDC hDCFont, LPINT retnFaces);
 VOID FillMenu(HWND hWnd);
 BOOL APIENTRY About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
-
-
 #endif /* end of include guard __LISTBOX_H__ */
 

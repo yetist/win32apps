@@ -8,7 +8,6 @@
 #include <string.h>
 #include "timer.h"
 
-
 UINT Counter = 0;
 HINSTANCE hInst;
 

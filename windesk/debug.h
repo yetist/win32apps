@@ -28,7 +28,7 @@ int debug_dialog_warn(const wchar_t* fmt, ...);
 int debug_dialog_error(const wchar_t* fmt, ...);
 int debug_dialog_yesno(const wchar_t* fmt, ...);
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #	define debug_print(format...) DebugPrint(__FILE__, __LINE__, __FUNCTION__, ##format);
 #else
 #	define debug_print(format...)

@@ -20,14 +20,9 @@
 #define __DESKTOP_H__ 1
 
 #include <wchar.h>
-//const char* getLogonShell(void);
-//BOOL setLogonShell(const char* value);
-//
-void hide_desktop(void);
+
 void show_desktop(void);
-//void show_desktop(void);
-//void disable_ctrl_alt_del(void);
-//wchar_t* get_logon_shell(void);
+void hide_desktop(void);
 
 #endif /* end of include guard __DESKTOP_H__ */
 

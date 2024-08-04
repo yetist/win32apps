@@ -21,7 +21,5 @@
 #include <windows.h>
 
 void PrintError(HWND hwnd, TCHAR* msg);
-wchar_t* get_login_shell(void);
-wchar_t* get_self_module_path(void);
 
 #endif /* end of include guard __UTILS_H__ */
