@@ -11,14 +11,14 @@
  *
  */
 #include <windows.h>
-#include "version.h"
+#include <version.h>
 
 /* Define some defaults (shouldn't be overwritten by applications */
-#define APPLICATION_DEFAULT_STR_COMPANY_NAME    "ReactOS Project"
-#define APPLICATION_DEFAULT_STR_DESCRIPTION     "ReactOS Core Component"
+#define APPLICATION_DEFAULT_STR_COMPANY_NAME    "Example Project"
+#define APPLICATION_DEFAULT_STR_DESCRIPTION     "Example Project"
 #define APPLICATION_DEFAULT_STR_INTERNAL_NAME   ""
-#define APPLICATION_DEFAULT_STR_LEGAL_COPYRIGHT "(C) 2024 ReactOS Project"
-#define APPLICATION_DEFAULT_STR_PRODUCT_NAME    "ReactOS Operating System"
+#define APPLICATION_DEFAULT_STR_LEGAL_COPYRIGHT "(C) 2024 Project"
+#define APPLICATION_DEFAULT_STR_PRODUCT_NAME    "Example Project"
 
 /* Set defaults for everything, unless overridden */
 #ifndef APPLICATION_FILEVERSION

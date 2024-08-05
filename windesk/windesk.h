@@ -19,9 +19,10 @@
 #ifndef __WINDESK_H__
 #define __WINDESK_H__ 1
 
+#include "debug.h"
+
 // 全局变量
 HINSTANCE hInst;
 HWND hWndMain;
 
 #endif /* end of include guard __WINDESK_H__ */
-

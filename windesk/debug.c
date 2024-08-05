@@ -41,7 +41,7 @@ BOOL DebugPrint(const char* file, int line, const char* func, const wchar_t *fmt
 	vsnwprintf(msg, sizeof(msg), fmt, ap);
 	va_end(ap);
 
-	snwprintf(buf, sizeof(buf), TEXT("%s:%d %s(): %ls\n"), file, line, func, msg);
+	snwprintf(buf, sizeof(buf), TEXT("%s:%d %s(): %ls"), file, line, func, msg);
     wprintf(TEXT("DEBUG: %ls"), buf);
     return WriteConsole(g_hOutput, (CONST VOID *)buf, wcslen(buf), NULL, NULL);
 }

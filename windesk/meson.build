@@ -1,4 +1,4 @@
-project('windesk', 'c'
+project('windesk', 'c',
     version: '1.25.0',
     meson_version: '>=0.47.0',
     license: 'GPL2',
@@ -14,33 +14,15 @@ version_major = version_arr[0].to_int()
 version_minor = version_arr[1].to_int()
 version_micro = version_arr[2].to_int()
 
-soversion = 2
-
-if version_minor.is_odd()
-  interface_age = 0
-else
-  interface_age = version_micro
-endif
-
-current = version_minor * 100 + version_micro - interface_age
-revision = interface_age
-libversion = '@0@.@1@.@2@'.format(soversion, current, revision)
-package_string = '@0@-@1@.0'.format(package_name, soversion)
-
 config_h = configuration_data()
-config_h.set_quoted('PACKAGE', package_name)
-config_h.set_quoted('PACKAGE_NAME', package_name)
-config_h.set_quoted('PACKAGE_STRING', package_string)
-config_h.set_quoted('PACKAGE_VERSION', package_version)
-config_h.set_quoted('GETTEXT_PACKAGE', package_name)
-config_h.set_quoted('VERSION', package_version)
-
-config_h.set_quoted('MARCO_LOCALEDIR', localdir)
-config_h.set_quoted('LIBDIR', libdir)
-config_h.set_quoted('MARCO_DATADIR', datadir)
+config_h.set('VERSION_MAJOR', version_major)
+config_h.set('VERSION_MINOR', version_minor)
+config_h.set('VERSION_MICRO', version_micro)
+config_h.set('PACKAGE_NAME', package_name)
+config_h.set('PACKAGE_VERSION', package_version)
 
 configure_file(
-    input: 'version.h.in'
+    input: 'version.h.in',
     output: 'version.h',
     configuration: config_h
 )
@@ -51,6 +33,12 @@ add_project_arguments([
   '-DUNICODE',
   '-I' + meson.build_root(),
   ], language: 'c')
+
+enable_debug = false
+if get_option('buildtype') == 'debug'
+    enable_debug = true
+    add_project_arguments(['-D_DEBUG'], language: 'c')
+endif
 
 win = import('windows')
 
@@ -70,7 +58,7 @@ windesk = executable('windesk',
     'utils.c',
     'windesk.c',
     res,
-    gui_app : true
+    gui_app : enable_debug
 )
 
 test('windesk', windesk)

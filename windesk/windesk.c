@@ -78,7 +78,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     RECT rect;
     switch (message) {
       case WM_CREATE:
-        show_desktop();
+        hide_desktop();
+        debug_dialog_info(L"%ls 好的n", L"你好");
         return 0;
       case WM_PAINT:
         hdc = BeginPaint (hwnd, &ps);

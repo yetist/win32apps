@@ -20,11 +20,6 @@
  * */
 
 #include <windows.h>
-//#include <shlwapi.h>
-//#include <winioctl.h>
-//#include <unistd.h>
-//#include <stdio.h>
-//#include <ctype.h>
 #include <tchar.h>
 #include "debug.h"
 
