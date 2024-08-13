@@ -659,8 +659,8 @@ BOOL APIENTRY About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
           return (TRUE);
       case WM_COMMAND:
           if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
-              EndDialog (hDlg,TRUE); 
-              return (TRUE); 
+              EndDialog (hDlg,TRUE);
+              return (TRUE);
           }
           break;
     }
