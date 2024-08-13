@@ -33,6 +33,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
     HWND hwnd;
     MSG msg;
     WNDCLASS wndclass;
+    int cxScreen;
+    int cyScreen;
 
     static TCHAR szAppName[] = TEXT ("HelloWin");
 
@@ -51,13 +53,17 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     szAppName, MB_ICONERROR);
         return 0;
     }
-    hwnd = CreateWindow( szAppName,                 // window class name
+
+    cxScreen = GetSystemMetrics (SM_CXSCREEN);
+    cyScreen = GetSystemMetrics (SM_CYSCREEN);
+
+    hwnd = CreateWindow(szAppName,                  // window class name
                         TEXT ("The Hello Program"), // window caption
-                        WS_OVERLAPPEDWINDOW,        // window style
-                        CW_USEDEFAULT,              // initial x position
-                        CW_USEDEFAULT,              // initial y position
-                        CW_USEDEFAULT,              // initial x size
-                        CW_USEDEFAULT,              // initial y size
+                        WS_POPUP | WS_MAXIMIZE,     // window style
+                        0,                          // initial x position
+                        cyScreen - 32,              // initial y position
+                        cxScreen,                   // initial x size
+                        32,                         // initial y size
                         NULL,                       // parent window handle
                         NULL,                       // window menu handle
                         hInstance,                  // program instance handle
@@ -79,7 +85,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message) {
       case WM_CREATE:
         hide_desktop();
-        debug_dialog_info(L"%ls 好的n", L"你好");
         return 0;
       case WM_PAINT:
         hdc = BeginPaint (hwnd, &ps);

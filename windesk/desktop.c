@@ -156,7 +156,7 @@ static BOOL start_desktop(void)
     }
 
     // Wait until child process exits.
-    WaitForSingleObject(pi.hProcess, INFINITE);
+    // WaitForSingleObject(pi.hProcess, INFINITE);
 
     // Close process and thread handles.
     CloseHandle(pi.hProcess);
@@ -180,8 +180,7 @@ void hide_desktop(void)
         return;
     }
 
-
-    debug_print(L"get shell: %s", shell);
+    debug_print(L"get shell: %s\n", shell);
 
     if (strcmp(shell, DEFAULT_SHELL) == 0 ) {
         set_login_shell(myself);
