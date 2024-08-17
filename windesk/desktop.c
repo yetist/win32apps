@@ -62,6 +62,27 @@ static BOOL writeRegKey(HKEY hkey, const char* path, const char* key, const char
     return FALSE;
 }
 
+
+static BOOL set_auto_restart(BOOL enable)
+{
+    HKEY hKey;
+    long lRet;
+    DWORD value = 0;
+
+//    if (enable)
+//        value = 1;
+
+    if(RegOpenKeyExA(HKEY_LOCAL_MACHINE, REG_PATH, 0, KEY_WRITE, &hKey) == ERROR_SUCCESS) {
+        lRet = RegSetValueExA(hKey, "AutoRestartShell", 0, REG_DWORD, (const BYTE*)&value, sizeof(value));
+        RegCloseKey(hKey);
+        if(lRet != ERROR_SUCCESS) {
+            return FALSE;
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
 static char* get_login_shell(void)
 {
 	char buf[1024] = {0};
@@ -97,8 +118,9 @@ static char* get_myself_path(void)
     }
 }
 
-static void stop_desktop(void)
+void stop_desktop(void)
 {
+    set_auto_restart(FALSE);
     //PROCESSENTRY32进程快照的结构体
     PROCESSENTRY32 pe;
 
@@ -130,7 +152,7 @@ static void stop_desktop(void)
     }
 }
 
-static BOOL start_desktop(void)
+BOOL start_desktop(void)
 {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;

@@ -1,0 +1,7 @@
+#include <windows.h>
+#include "mypixel.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+SMALL       ICON DISCARDABLE "small.ico"

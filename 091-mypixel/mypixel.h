@@ -16,15 +16,17 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  * */
 
-#ifndef __DESKTOP_H__
-#define __DESKTOP_H__ 1
+#ifndef __MYPIXEL_H__
+#define __MYPIXEL_H__ 1
 
-#include <wchar.h>
+#define IDC_STATIC  -1
 
-BOOL start_desktop(void);
-void stop_desktop(void);
-void show_desktop(void);
-void hide_desktop(void);
+LRESULT APIENTRY MainWndProc(HWND hWnd,
+                             UINT message,
+                             WPARAM wParam,
+                             LPARAM lParam);
+BOOL InitApplication(HINSTANCE hInstance);
+BOOL InitInstance(HINSTANCE hInstance, int nCmdShow);
 
-#endif /* end of include guard __DESKTOP_H__ */
+#endif /* end of include guard __MYPIXEL_H__ */
 
