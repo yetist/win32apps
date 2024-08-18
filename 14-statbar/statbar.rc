@@ -1,0 +1,124 @@
+#include "resource.h"
+#include "windows.h"
+#include "winuser.h"
+#include "statbar.h"
+
+// Icon
+SMALL ICON DISCARDABLE "Small.ico"
+
+STATUSBARICON ICON DISCARDABLE "rcIcon.ico"
+
+// Menu
+STATUSBARMENU MENU DISCARDABLE
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "退出(&X)", IDM_EXIT
+    END
+    POPUP "编辑(&E)"
+    BEGIN
+        MENUITEM "撤消(&U)", IDM_EDITUNDO, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "剪切(&T)", IDM_EDITCUT
+        MENUITEM "复制(&C)", IDM_EDITCOPY
+        MENUITEM "粘贴(&P)", IDM_EDITPASTE
+        MENUITEM "删除(&D)", IDM_EDITDELETE
+        MENUITEM SEPARATOR
+        MENUITEM "全部选定(&A)", IDM_EDITSELECTALL
+    END
+    POPUP"显示(&V)"
+    BEGIN
+        MENUITEM "显示状态栏(&S)", IDM_SHOWSTATUSBA, CHECKED
+    END
+    POPUP "格式(&M)"
+    BEGIN
+        MENUITEM "粗体(&B)", IDM_BOLD
+        MENUITEM "斜体(&I)", IDM_ITALIC
+        MENUITEM "加下划线(&U)", IDM_UNDERLINE
+        MENUITEM "加删除线(&S)", IDM_STRIKEOUT
+        MENUITEM  SEPARATOR
+        MENUITEM "左对齐(&L)", IDM_ALIGNLEFT, CHECKED
+        MENUITEM "居中(&C)", IDM_ALIGNCENTER
+        MENUITEM "右对齐(&R)", IDM_ALIGNRIGHT
+    END
+    POPUP "字体(&T)"
+    BEGIN
+        MENUITEM"选择字体(&F)...", IDM_SELECTFONTFACE
+        MENUITEM"设置字体尺寸(&Z)...", IDM_SELECTFONTSIZE
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM"关于(&A)..:", IDM_ABOUT
+    END
+END
+
+// Dialog 11
+ABOUTBOX DIALOG DISCARDABLE 20, 25,124,77
+STYLE DS_MODALFRAME | WS_POPUPIWSVISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "关于应用状态栏的程序示范"
+FONT 14,"隶书_GB2312"
+BEGIN
+    PUSHBUTTON "确定"，IDOK,43,51,40,14
+    CTEXT "状态栏示范程序"，IDC_STATIC,22,9,92,8
+    CTEXT "柳永新编写"， IDC_STATIC,30,24,76,10, NOT WS_GROUP
+    CTEXT "一九九六年十月"，IDC_STATIC,36,37,65,8,NOT WS_GROUP
+    ICON "StatusBarICON", IDC_STATIC,11,23,18,20
+    CONTROL "", IDC_STATIC,"Static", SS_BLACKFRAME, 40,34,56,1
+END
+
+SELECTFONTFACEDLGBOX DIALOG DISCARDABLE 0,0, 140,117
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION| WS_SYSMENU
+CAPTION"选择字体"
+FONT 10, "System"
+BEGIN
+    DEFPUSHBUTTON "确定"，IDOK,9,93,50,14
+    PUSHBUTTON "取消"，IDCANCEL,76,92,50,14
+    LTEXT "可选择的True Type字体:",IDC_STATIC,13,5,84,8
+    COMBOBOX IDC_FONTFACE, 15,25,95,64, CBS_SIMPLE | CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+END
+
+SELECTFONTSIZEDLGBOX DIALOGEX 0,0,136,82
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "设置字体尺寸"
+FONT 10, "Svstem", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON "确定"，IDOK, 13, 57,50,14
+    PUSHBUTTON "取消"，IDCANCEL, 74, 57, 50, 14
+    COMBOBOX IDC_FONTSIZE, 19, 13, 54, 62, CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP, WS_EX_RIGHT
+END
+
+
+//Bitmap
+
+ALIGNLEFT BITMAP DISCARDABLE "Left.bmp"
+ALIGNCENTER BITMAP DISCARDABLE "Center.bmp"
+ALIGNRIGHT BITMAP DISCARDABLE "Right.bmp"
+
+// String Table
+STRINGTABLE DISCARDABLE
+BEGIN
+    IDM_BOLD "使得字符变粗"
+    IDM_ITALIC "使字符具有倾斜的效果"
+    IDM_UNDERLINE "在字符下方加上一条直线"
+    IDM_STRIKEOUT "使文字加上一条删除线"
+    IDM_ABOUT "显示程序有关信息、版本号"
+    IDM_SELECTFONTFACE "为当前选定的内容改设字体..."
+    IDM_SELECTFONTSIZE "改设文字的字体大小..."
+    IDM_ALIGNLEFT "文字按左端对齐排列"
+    IDM_ALIGNCENTER "文字排列于一行中间位置"
+    IDM_ALIGNRIGHT "文字按右端对齐排列"
+    61536 "关闭当前窗口"
+    61456 "移动当前窗口"
+    61488 "将当前窗口最大化"
+    61472 "将当前窗口最小化"
+    61728 "恢复窗口为正常大小"
+    61440 "调整窗口尺寸"
+    IDM_SHOWSTATUSBAR "隐藏状态栏"
+    IDM_EDITUNDO "撤消前一次编辑操作"
+    IDM_EDITCUT "把选定的内容剪切到剪贴板上"
+    IDM_EDITCOPY "把选定的内容复制到剪贴板上"
+    IDM_EDITPASTE "在当前位置插入剪贴板上的内容"
+    IDM_EDITDELETE "删除选定的内容"
+    IDM_EDITSELECTALL "选定所有的文字内容"
+    IDM_EXIT "退出应用程序"
+END
