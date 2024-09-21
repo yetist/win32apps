@@ -128,7 +128,7 @@ LRESULT APIENTRY MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
     UINT uItem;
 
     switch (message) {
-        case WM CREATE:
+        case WM_CREATE:
             {
                 //装入位图资源。
                 hBmpAlignLeft  = LoadBitmap (hInst, "AlignLeft");
@@ -213,16 +213,17 @@ LRESULT APIENTRY MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
             }
             break;
         case WM_MENUSELECT:
-            // 当用户在菜单中选择菜单项时，让状态栏的第一分区显示相关信息
+            /*当用户在菜单中选择菜单项时，让状态栏的第一分区显示相关信息。*/
             if (LoadString(hInst, LOWORD(wParam), szBuf, 128)) {
                 SendMessage(hWndStatusBar, SB_SETTEXT, 0 | SBT_NOBORDERS, (LPARAM)(LPSTR) szBuf);
             } else {
                 SendMessage(hWndStatusBar, SB_SETTEXT, 0 | SBT_NOBORDERS, (LPARAM)(LPSTR) "愿事事顺心，时时如意");
             }
             break;
+
         case WM_DRAWITEM:
             if((int)wParam == ID_STATUSBAR) {
-                // 在状态栏的第二分区上画上相应的位图，来反映段落对齐方式
+                /*在状态栏的第二分区上画上相应的位图，来反映段落对齐方式。*/
                 LPDRAWITEMSTRUCT lpDis;
                 HDC hdcMem;
                 BITMAP bitmap;
@@ -245,22 +246,209 @@ LRESULT APIENTRY MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
             }
             break;
         case WM_NOTIFY:
+            switch (((LPNMHDR)lParam)->code)
             {
+                case EN_SELCHANGE:
+                    /*一旦用户在多文本编辑控件中移动了插入符的位置或改变了文字选择，
+              应用程序就会在这里接收和处理通知消息。 */
 
+                    //在状态栏的第一分区中显示当前插入符所在的行与列的数值。
+                    UpdateCaretPositionState (hWndRichEdit,hWndStatusBar);
+                    //在状态栏的第二分区中显示当前插入符所在段落的对齐方式。
+                    UpdateAlignState (hWnd,hWndRichEdit, hWndStatusBar);
+                    //在状态栏的第三分区中显示当前插入符所在位置的字符格式。
+                    UpdateCharFormatState (hWnd, hWndRichEdit,
+                                           hWndStatusBar);
+                    break;
+                default:
+                    return (DefWindowProc (hWnd, message, wParam, lParam));
             }
             break;
         case WM_COMMAND:
+            uItem = LOWORD( wParam);
+            switch (uItem)
             {
+                case IDM_SHOWSTATUSBAR:
+                    /*显示或隐藏状态栏，并相应地调整多文本编辑控件的尺寸。*/
+                    bShowStatusBar = !bShowStatusBar;
+                    CheckMenuItem (GetMenu (hWnd), IDM_SHOWSTATUSBAR,
+                                   MF_BYCOMMAND | (bShowStatusBar ? MF_CHECKED : MF_UNCHECKED));
+                    ShowWindow (hWndStatusBar, bShowStatusBar ? SW_SHOW : SW_HIDE);
+                    MoveWindow (hWndRichEdit, 0,0, nCxClient, bShowStatusBar ? nCyClient - nCyStatusBar : nCyClient, TRUE);
+                    if (bShowStatusBar)
+                        MoveWindow(hWndStatusBar, 0, nCyClient - nCyStatusBar, nCxClient, nCyClient, TRUE);
+                    break;
 
+                case IDM_EDITUNDO:
+                    SendMessage( hWndRichEdit, WM_UNDO, 0,0);
+                    break;
+                case IDM_EDITCUT:
+                    SendMessage(hWndRichEdit, WM CUT, 0,0);
+                    break;
+                case IDM_EDITCOPY:
+                    SendMessage( hWndRichEdit, WM COPY,0,0);
+                    break;
+                case IDM_EDITPASTE:
+                    SendMessage( hWndRichEdit, WM PASTE, 0,0);
+                    break;
+                case IDM_EDITDELETE:
+                    SendMessage(hWndRichEdit, WMCLEAR,0,0);
+                    break;
+                case IDM_EDITSELECTALL:
+                    SendMessage( hWndRichEdit, EMSETSEL,0,-1);
+                    break;
+                case IDM_SELECTFONTFACE:
+                    DialogBox (hInst, "SelectFontFaceDlgBox",hWnd,
+                               (DLGPROC)SelectFontFaceDlgProc);
+                    break;
+                case IDM_SELECTFONTSIZE:
+                    DialogBox (hInst, "SelectFontSizeDlgBox", hWnd,
+                               (DLGPROC)SelectFontSizeDIgProOc);
+                    break;
+                case IDM_SELECTFONTSIZE:
+                    DialogBox (hInst, "SelectFontSizeDlgBox", hWnd,
+                               (DLGPROC)SelectFontSizeDIgProc);
+                    break;
+                case IDM_ALIGNLEFT:
+                case IDM_ALIGNRIGHT:
+                case IDM_ALIGNCENTER:
+                    HandleAlignCommand (hWnd, hWndRichEdit, LOWORD( wParam ));
+                    UpdateAlinState (hWnd, hWndRichEdit, hWndStatusBar);
+                    break;
+                case IDM_BOLD:
+                case IDM_ITALIC:
+                case IDM_UNDERLINE:
+                case IDM_STRIKEOUT:
+                    HandleCharEffectCommand (hWndRichEdit, uItem);
+                    UpdateCharFormatState (hWnd,hWndRichEdit,
+                                           hWndStatusBar);
+                    break;
+                case IDM_EXIT:
+                    SendMessage (hWnd, WM CLOSE,0,0L);
+                    return 0;
+                case IDM_ABOUT:
+                    DialogBox (hInst, "AboutBox", hWnd, (DLGPROC)About);
+                    return 0;
+                default:
+                    return (DefWindowProc (hWnd, message, wParam, lParam));
             }
             break;
         case WM_DESTROY:
+            if (hWndRichEdit)
+                DestroyWindow (hWndRichEdit);
+            if (hWndStatusBar)
+                DestroyWindow (hWndStatusBar);
+            if (hRTFLib)
+            {
+                FrееLіbrаrу (hRТFLіb);
+                hRTFLib = NULL;
+            }
+            PostQuitMessage(0);
             break;
         default:
             return (DefWindowProc(hWnd, message, wParam, lParam));
     }
-    return 0;
+    return (0);
 }
 
+/**
+* 函数:UpdateCaretPositionState(HWND,HWND)
+* 用途:在状态栏上显示多文本编辑控件中插入符的位置。
+*/
 
+void UpdateCaretPositionState (HWND hWndRichEdit, //多文本编辑控件句柄
+                               HWND hWndStatusBar) //状态栏控件句柄
+{
+    CHAR szPosInfo[256];
+    int iRow, iCol;
+    CHARRANGE CharRange;
+    //找出插入符所在的位置(索引值).(如果有已选择的文字，那么就采用该文字选择的始点位置)。
 
+    SendMessage (hWndRichEdit, EM EXGETSEL, 0, (LPARAM) &CharRange);
+    //根据索引值计算插入符所在行与列的具体数值。
+    iRow=(int)SendMessage (hWndRichEdit,
+                           EM_EXLINEFROMCHAR,
+                           0,
+                           (LPARAM) (CharRange.cpMin));
+    iCol=(int)(CharRange.cpMin - (int) SendMessage(hWndRichEdit,
+                                                   EM_LINEINDEX,
+                                                   iRow,
+                                                   0));
+    //对信息字符串进行格式化。
+    wsprintf (szPosInfo,"行:%d,列:%d\t\t总索引位置:%d", iRow + 1, iCol +1,
+              CharRange.cpMin);
+    //把信息文字显示在状态栏的第一个部分中。
+    SendMessage (hWndStatusBar, SB_SETTEXT, 0| SBT_NOBORDERS, (LPARAM)szPosInfo);
+}
+
+/*
+函数:UpdateAlignState(HWND,HWND, HWND) 
+用途:根据多文本编辑控件中插入符当前位置所在段落的对齐方式，来
+改变相应的状态栏和菜单项的状态。 
+*/
+void UpdateAlignState (HWND hWnd, //主窗口句柄
+                       HWND hWndRichEdit, //多文本编辑控件句柄
+                       HWND hWndStatusBar) //状态栏控件句柄
+{
+    UINT uAlignCommand;
+    PARAFORMAT ParaFormat;
+    HMENU hMenu;
+    //检取当前插入符所在段落的排列对齐格式。
+    ParaFormat.cbSize - sizeof (ParaFormat);
+    ParaFormat.dwMask = PFM_ALIGNMENT;
+    SendMessage (hWndRichEdit, EM_GETPARAFORMAT, 0, (LPARAM)&ParaFormat);
+    switch(ParaFormat. wAlignment)
+    {
+    case PFA_LEFT:
+            uAlignCommand = IDM_ALIGNLEFT;
+            hBmpAlign = hBmpAlignLeft;
+            break;
+    case PFA_CENTER:
+            uAlignCommand- IDM_ALIGNCENTER;
+            hBmpAlign= hBmpAlignCenter;
+            break;
+    case PFA_RIGHT:
+            uAlignCommand = IDM ALIGNRIGHT;
+            hBmpAlign = hBmpAlignRight;
+            break;
+    }
+    //在状态栏中显示反映对齐方式的位图。
+    SendMessage (hWndStatusBar, SB_SETTEXT,
+                 1 | SBT_OWNERDRAW| SBT_POPOUT,
+                 (LPARAM)hBmpAlign);
+
+    //改设菜单项的状态。
+    hMenu=GetMenu (hWnd );
+    CheckMenuRadioltem (hMenu, IDM_ALIGNLEFT, IDM_ALIGNRIGHT,
+                        uAlignCommand, MF_BYCOMMAND);
+}
+
+/*******
+函数:HandleAlignCommand(HWND,HWND, int)
+用途:处理段落排列对齐命令。
+*/
+VOID HandleAlignCommand(HWND hWnd, //主窗口句柄
+                        HWND hWndRichEdit, //多文本窗口句柄
+                        int iAlign) //对齐命令
+{
+    PARAFORMAT ParaFormat;
+    //先填写段落格式结构PARAFORMAT中的字节尺寸和屏蔽码成员的值。
+    ParaFormat.cbSize = sizeof (PARAFORMAT);
+    ParaFormat.dwMask = PFM_ALIGNMENT;
+    switch (Align)
+    {
+        case IDM_ALIGNLEFT:
+            ParaFormat.wAlignment = PFA_LEFT;
+            break;
+        case IDM_ALIGNRIGHT:
+            ParaFormat.wAlignment = PFA_RIGHT;
+            break;
+        case IDM_ALIGNCENTER:
+            ParaFormat.wAlignment = PFA_CENTER;
+            break;
+    }
+    //设置新的段落格式(对齐方式)。
+    SendMessage (hWndRichEdit, EM_SETPARAFORMAT, 0, (LPARAM)&ParaFormat);
+    //设置多文本编辑控件的修改标志。
+    SendMessage (hWndRichEdit, EM_SETMODIFY, (WPARAM)TRUE, 0L),
+}
