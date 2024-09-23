@@ -44,7 +44,7 @@
 
 // 【字体】菜单
 #define IDM_SELECTFONTFACE 500
-#define IDM SELECTFONTSIZE 501
+#define IDM_SELECTFONTSIZE 501
 
 //对话框中的控件标识号
 #define IDC_STATIC -1
@@ -60,22 +60,22 @@
 # define NUM POINTS 16
 
 //保存系统中可用的True Type字体信息的结构
-typedef struct tag True TypeFontInfo {
+typedef struct tagTrueTypeFontInfo {
     LOGFONT *plf;
     TEXTMETRIC *ptm;
-} TRUETYPEFONTINFO, * PTRUETYPEFONTINFO;
+} TRUETYPEFONTINFO, *PTRUETYPEFONTINFO;
 
 //函数原型说明
 // 过程
-LRESULT APIENTRY Main WndProc (HWND, UINT, WPARAM, LPARAM);
+LRESULT APIENTRY MainWndProc (HWND, UINT, WPARAM, LPARAM);
 BOOL APIENTRY PasswordDlgProc (HWND, UINT, WPARAM, LPARAM);
-BOOL APIENTRY About (HWND, UINT, WPARAM, LPARAM),
-     BOOL APIENTRY SelectFontFaceDlgProc (HWND, UINT, WPARAM, LPARAM);
+BOOL APIENTRY About (HWND, UINT, WPARAM, LPARAM);
+BOOL APIENTRY SelectFontFaceDlgProc (HWND, UINT, WPARAM, LPARAM);
 BOOL APIENTRY SelectFontSizeDlgProc (HWND, UINT, WPARAM, LPARAM);
 // 字体枚举回调函数
 int APIENTRY MyEnumFontFacesProc (LPLOGFONT, LPTEXTMETRIC, DWORD,
                                   LPVOID);
-int APIENTRY MyEnumFontCount Proc (LPLOGFONT, LPTEXTMETRIC, DWORD,
+int APIENTRY MyEnumFontCountProc (LPLOGFONT, LPTEXTMETRIC, DWORD,
                                    LPINT);
 //其他函数
 BOOL InitApplication (HINSTANCE);
@@ -87,7 +87,6 @@ VOID HandleAlignCommand (HWND, HWND, int);
 VOID UpdateCaretPositionState (HWND, HWND);
 VOID UpdateAlignState (HWND, HWND, HWND);
 VOID UpdateCharFormatState (HWND, HWND, HWND);
-void HandleCharEffectCommand (HWND, UINT),
+void HandleCharEffectCommand (HWND, UINT);
 
 #endif /* __STATBAR_H__ */
-
