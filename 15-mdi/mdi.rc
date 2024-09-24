@@ -1,0 +1,53 @@
+#include "windows.h" 
+
+/* UTF-8
+ * maybe mingw does not support code_page(CP_UTF8) style */
+#pragma code_page(65001)
+
+//主窗口菜单
+MDIMENU MENU DISCARDABLE 
+BEGIN 
+    POPUP "文件" 
+    BEGIN 
+        MENUITEM "新建", 10
+        MENUITEM "退出", 11
+    END 
+    POPUP "窗口" 
+    BEGIN 
+        MENUITEM "排列图标", 30 
+        MENUITEM "叠置",     31
+        MENUITEM "并列",     32 
+        MENUITEM "下一个",   33 
+        MENUITEM "关闭",     34
+    END 
+END 
+
+//子窗口菜单
+MDIMENUDOC MENU DISCARDABLE 
+BEGIN 
+    POPUP "文件" 
+    BEGIN 
+        MENUITEM "新建", 10
+        MENUITEM "退出", 11
+    END 
+    POPUP "测试"
+    BEGIN 
+        MENUITEM "测试1", 20
+        MENUITEM "测试2", 21
+    END 
+    POPUP "窗口" 
+    BEGIN 
+        MENUITEM "排列图标",     30
+        MENUITEM "叠置子窗口",   31
+        MENUITEM "并列子窗口",   32
+        MENUITEM "下一个子窗口", 33
+        MENUITEM "关闭子窗口",   34
+    END 
+END 
+
+//快捷键
+MDIACCEL ACCELERATORS MOVEABLE PURE
+BEGIN
+    VK_F1, 20, VIRTKEY, SHIFT
+    VK_F2, 30, VIRTKEY, SHIFT
+END 
