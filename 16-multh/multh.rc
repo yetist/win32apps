@@ -1,0 +1,23 @@
+#include <windows.h>
+
+/* UTF-8
+ * maybe mingw does not support code_page(CP_UTF8) style */
+#pragma code_page(65001)
+
+MYMENU MENU
+{
+    POPUP "多进程/多线程" {
+        MENUITEM "启动新进程", 10
+        MENUITEM "退出子进程", 11
+        MENUITEM "建立新线程", 12
+    }
+    MENUITEM "帮助", 13
+}
+
+MYACCEL ACCELERATORS
+{
+    VK_F1, 10, VIRTKEY, SHIFT
+    VK_F2, 11, VIRTKEY
+    VK_F3, 12, VIRTKEY
+    VK_F4, 13, VIRTKEY
+}
