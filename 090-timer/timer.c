@@ -27,44 +27,44 @@ INT_PTR CALLBACK TimerDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
     static HWND hSun, hMoon;
 
     switch(msg) {
-      case WM_INITDIALOG:
-        hSun = GetDlgItem(hDlg, IDC_SUN);
-        hMoon = GetDlgItem(hDlg, IDC_MOON);
-        SetTimer(hDlg, SUNTIMER, 1000, (TIMERPROC) NULL);
-        return TRUE;
-      case WM_TIMER:
-          if(fShowSun) {
-              ShowWindow(hMoon, SW_HIDE);
-              ShowWindow(hSun, SW_SHOW);
-          } else {
-              ShowWindow(hMoon, SW_SHOW);
-              ShowWindow(hSun, SW_HIDE);
-          }
-          fShowSun = !fShowSun;
-          break;
-      case WM_COMMAND:
-          switch(LOWORD(wParam)) {
-            case IDC_STARTTIMER:
-              if(fStartTimer) {
-                  SetDlgItemText(hDlg, IDC_STARTTIMER,
-                                 TEXT("停止下面的计时器"));
-                  SetTimer(hDlg, MYTIMER, 300, (TIMERPROC) MyTimerProc);
-              } else {
-                  KillTimer(hDlg, MYTIMER);
-                  SetDlgItemText(hDlg, IDC_STARTTIMER,
-                                 TEXT("启动下面的计时器"));
-                  Counter = 0;
-              }
-              fStartTimer = !fStartTimer;
-              break;
-            case IDCANCEL:
-              KillTimer(hDlg, SUNTIMER);
-              if(!fStartTimer)
-                  KillTimer(hDlg, MYTIMER);
-              EndDialog(hDlg, TRUE);
-              return TRUE;
-          }
-          break;
+        case WM_INITDIALOG:
+            hSun = GetDlgItem(hDlg, IDC_SUN);
+            hMoon = GetDlgItem(hDlg, IDC_MOON);
+            SetTimer(hDlg, SUNTIMER, 1000, (TIMERPROC) NULL);
+            return TRUE;
+        case WM_TIMER:
+            if(fShowSun) {
+                ShowWindow(hMoon, SW_HIDE);
+                ShowWindow(hSun, SW_SHOW);
+            } else {
+                ShowWindow(hMoon, SW_SHOW);
+                ShowWindow(hSun, SW_HIDE);
+            }
+            fShowSun = !fShowSun;
+            break;
+        case WM_COMMAND:
+            switch(LOWORD(wParam)) {
+                case IDC_STARTTIMER:
+                    if(fStartTimer) {
+                        SetDlgItemText(hDlg, IDC_STARTTIMER,
+                                       TEXT("停止下面的计时器"));
+                        SetTimer(hDlg, MYTIMER, 300, (TIMERPROC) MyTimerProc);
+                    } else {
+                        KillTimer(hDlg, MYTIMER);
+                        SetDlgItemText(hDlg, IDC_STARTTIMER,
+                                       TEXT("启动下面的计时器"));
+                        Counter = 0;
+                    }
+                    fStartTimer = !fStartTimer;
+                    break;
+                case IDCANCEL:
+                    KillTimer(hDlg, SUNTIMER);
+                    if(!fStartTimer)
+                        KillTimer(hDlg, MYTIMER);
+                    EndDialog(hDlg, TRUE);
+                    return TRUE;
+            }
+            break;
     }
     return FALSE;
 }

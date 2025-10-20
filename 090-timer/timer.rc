@@ -14,7 +14,7 @@ BEGIN
     CONTROL       "SUN",              IDC_SUN,  "Static",  SS_BITMAP, 11, 10, 11, 11
     CONTROL       "MOON",             IDC_MOON,  "Static", SS_BITMAP, 11, 10, 11, 11
     LTEXT         "0",                IDC_TIMECOUNTER, 61, 46, 43, 14
-    PUSHBUTTON      "启动下面的计时器", IDC_STARTTIMER, 51, 18, 69, 13
+    PUSHBUTTON    "启动下面的计时器", IDC_STARTTIMER, 51, 18, 69, 13
 END
 
 // Bitmap

@@ -20,4 +20,3 @@
 INT_PTR CALLBACK TimerDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 VOID CALLBACK MyTimerProc(HWND hWnd, UINT message, UINT idTimer, DWORD dwTime);
 #endif /* __TIMER_H__ */
-
