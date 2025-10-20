@@ -76,7 +76,7 @@ BOOL FirstInit(HANDLE hInstance) //窗口类初始化函数ibm
     wcFirstClass.hInstance     = hInstance;
     wcFirstClass.style         = CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS;
     wcFirstClass.lpfnWndProc   = DocWndProc;
-    wcFirstClass.cbClsExtra    = 0; 
+    wcFirstClass.cbClsExtra    = 0;
     wcFirstClass.cbWndExtra    = sizeof (LOCALHANDLE);
     if(!RegisterClass(&wcFirstClass)) //注册子窗口类
         return FALSE;
@@ -100,7 +100,7 @@ LRESULT CALLBACK FrameWndProc (HWND hWnd, UINT message,
                                       0,0,0,0, hWnd, NULL, hInst, (LPSTR)&clcr);
             return 0L;
         case WM_COMMAND: //菜单消息响应
-            switch (LOWORD(wParam)) 
+            switch (LOWORD(wParam))
             {
                 case 10://创建MDI子窗口
                     mdi.szClass=L"WIN_MDI:DOC";
@@ -243,7 +243,7 @@ LRESULT CALLBACK DocWndProc (HWND hWnd,UINT message,
         case WM_MDIACTIVATE: //完成主窗口和子窗口菜单之间的切换
             if (lParam)
                 SendMessage(hWndClient, WM_MDISETMENU, (WPARAM)hMenuDoc,0);
-            else 
+            else
                 SendMessage (hWndClient, WM_MDISETMENU, (WPARAM)hMenu, 0);
             DrawMenuBar (hWndFrame);
             return 0L;
