@@ -26,20 +26,20 @@
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch (Msg) {
-      case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
 
-      case WM_PAINT:
+        case WM_PAINT:
             {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
+                PAINTSTRUCT ps;
+                HDC hdc = BeginPaint(hWnd, &ps);
 
-            // All painting occurs here, between BeginPaint and EndPaint.
-            FillRect(hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW+1));
-            EndPaint(hWnd, &ps);
+                // All painting occurs here, between BeginPaint and EndPaint.
+                FillRect(hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW+1));
+                EndPaint(hWnd, &ps);
             }
-        return 0;
+            return 0;
     }
 
     return DefWindowProc(hWnd, Msg, wParam, lParam);
@@ -74,7 +74,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine
                           NULL,       // Menu
                           hInstance,  // Instance handle
                           NULL        // Additional application data
-                         );
+                          );
 
     if (hWnd == NULL){
         return 0;
