@@ -116,7 +116,7 @@ void replace_font(LPCWSTR fontname, LPCWSTR fontfile)
     RegCloseKey(hKey);
 }
 
-static void output_writeconsole(const WCHAR *str)
+static void output_writeconsole(LPCWSTR str)
 {
     DWORD count;
 
@@ -142,130 +142,78 @@ static void output_writeconsole(const WCHAR *str)
 #define MAX_KEY_LENGTH 255
 #define MAX_VALUE_NAME 16383
 
-static LPCWSTR installed_fonts()
+// Function to convert LPBYTE (assuming it's a null-terminated ANSI string) to wchar_t*
+wchar_t* ConvertLPBYTEToWChar(LPBYTE lpByteData)
 {
-//    WCHAR    achKey[MAX_KEY_LENGTH];   // buffer for subkey name
-//    DWORD    cbName = 0;                   // size of name string
-//    DWORD    cchClassName = MAX_PATH;  // size of class string
+    if (!lpByteData)
+    {
+        return NULL;
+    }
 
-    DWORD    c= 0;              // number of values for key
+    // Calculate the required buffer size for the wide-character string
+    // CP_ACP specifies the system's default ANSI codepage
+    int requiredSize = MultiByteToWideChar(CP_ACP, 0, (LPCSTR)lpByteData, -1, NULL, 0);
+    if (requiredSize == 0)
+    {
+        return NULL;
+    }
 
-//    DWORD    cbMaxSubKey = 0;              // longest subkey size
-//    DWORD    cchMaxClass = 0;              // longest class string
-//
-//
-//    DWORD    cchMaxValue = 0;          // longest value name
-//    DWORD    cbMaxValueData = 0;       // longest value data
-//    DWORD    cbSecurityDescriptor = 0; // size of security descriptor
-//    FILETIME ftLastWriteTime;      // last write time
+    // Allocate memory for the wide-character string
+    //wchar_t* wideCharString = new wchar_t[requiredSize];
 
-    LONG lResult;
+    wchar_t* wideCharString = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, requiredSize);
+    if (!wideCharString)
+    {
+        // Handle memory allocation error
+        return NULL;
+    }
+
+    // Perform the conversion
+    MultiByteToWideChar(CP_ACP, 0, (LPCSTR)lpByteData, -1, wideCharString, requiredSize);
+    return wideCharString;
+}
+
+
+static LPCWSTR installed_fonts(LPCWSTR font)
+{
+    DWORD c= 0;              // number of values for key
+    LONG  lResult;
+    WCHAR name[MAX_PATH];
+    DWORD name_size;
+    DWORD i, size, type;
+    LPBYTE value = NULL;
+    LPWSTR s;
 
     HKEY hKey = openKey(HKEY_LOCAL_MACHINE,
                         L"Software\\Microsoft\\Windows\\CurrentVersion\\Fonts");
     lResult = RegQueryInfoKeyW(hKey,                    // key handle
-                              NULL,                // buffer for class name
-                              NULL,           // size of class string
-                              NULL,                    // reserved
-                              NULL,               // number of subkeys
-                              NULL,            // longest subkey size
-                              NULL,            // longest class string
-                              &c,                // number of values for this key
-                              NULL,            // longest value name
-                              NULL,         // longest value data
-                              NULL,   // security descriptor
-                              NULL);       // last write time
+                               NULL,                // buffer for class name
+                               NULL,           // size of class string
+                               NULL,                    // reserved
+                               NULL,               // number of subkeys
+                               NULL,            // longest subkey size
+                               NULL,            // longest class string
+                               &c,                // number of values for this key
+                               NULL,            // longest value name
+                               NULL,         // longest value data
+                               NULL,   // security descriptor
+                               NULL);       // last write time
 
-    //wprintf(L"Keys: %d, Values: %d\n", cSubKeys, cValues);
-    printf("Values: %ld\n", c);
-
-    WCHAR s_szName[MAX_PATH];
-    DWORD s_cchName;
-    DWORD i, cb, type;
-    /* Retrieve the value names associated with the current key */
     for(i = 0; i < c; i++)
     {
-        s_cchName = _countof(s_szName);
-        lResult = RegEnumValueW(hKey, i, s_szName, &s_cchName, NULL, NULL, NULL, &cb);
-
-//      lResult = RegEnumValueW(hKey, i, szValueName, &cbName, NULL, &dwType, szValueData, &cbData);
-        if (lResult != ERROR_SUCCESS)
-            goto done;
-        //if (s_cchName >= _countof(s_szName))
-        //    continue;
-        output_writeconsole(s_szName);
-        output_writeconsole(L"\n");
-        //ppszNames[i] = _wcsdup(s_szName);
+        name_size = _countof(name);
+        lResult = RegEnumValueW(hKey, i, name, &name_size, NULL, &type, NULL, &size);
+        if (lResult == ERROR_SUCCESS)
+        {
+            value = malloc(size);
+            lResult = RegQueryValueExW(hKey, name, NULL, &type, value, &size);
+            s = wcsstr((LPCWSTR)value, font);
+            if (s) {
+                wprintf(L"found font: %ls\n", font);
+            }
+            free(value);
+        }
     }
-
-//    LONG lResult;
-//    DWORD dwIndex, dwType, cbName, cbData;
-//    FILETIME ft;
-//    WCHAR szSubKey[256];
-//
-//    dwIndex = 0;
-//    do
-//    {
-//        cbName = ARRAY_SIZE(szValueName);
-//        cbData = ARRAY_SIZE(szValueData);
-//        lResult = RegEnumValueW(hKey, dwIndex++, szValueName, &cbName, NULL, &dwType, szValueData, &cbData);
-//        if (lResult == ERROR_SUCCESS)
-//        {
-//            lResult = RegSetValueExW(hDestSubKey, szValueName, 0, dwType, szValueData, cbData);
-//            if (lResult)
-//                goto done;
-//        }
-//    }
-//    while(lResult == ERROR_SUCCESS);
-
-done:
-    //output_writeconsole(const WCHAR *str, DWORD wlen);
-//    subkey_name = malloc(MAX_SUBKEY_LEN * sizeof(WCHAR));
-//
-//    path_len = lstrlenW(path);
-//
-//    i = 0;
-//    for (;;)
-//    {
-//        subkey_len = MAX_SUBKEY_LEN;
-//        rc = RegEnumKeyExW(key, i, subkey_name, &subkey_len, NULL, NULL, NULL, NULL);
-//        if (rc == ERROR_SUCCESS)
-//        {
-//            subkey_path = build_subkey_path(path, path_len, subkey_name, subkey_len);
-//            if (!RegOpenKeyExW(key, subkey_name, 0, KEY_READ, &subkey))
-//            {
-//                export_registry_data(fp, subkey, subkey_path, unicode);
-//                RegCloseKey(subkey);
-//            }
-//            free(subkey_path);
-//            i++;
-//        }
-//        else break;
-//    }
-//
-//    free(subkey_name);
-//
-//    lRet = RegQueryValueExW(hkey, name, 0, &type, 0, &size);
-//    if (lRet == ERROR_FILE_NOT_FOUND ) {
-//        printf("key is not exists\n");
-//        type = REG_SZ;
-//        lRet = RegSetValueExW(hkey, name, 0, type, (LPBYTE)value,
-//                              (DWORD)(wcslen(value) + 1) * sizeof(WCHAR));
-//        if (lRet == ERROR_SUCCESS)
-//            return TRUE;
-//        else
-//            return FALSE;
-//    } else if (lRet == ERROR_SUCCESS) {
-//        printf("query success\n");
-//        printf("res: %ld, type: %ld, size: %ld\n", lRet, type, size);
-//        if (type == REG_SZ || type == REG_NONE) {
-//            lRet = RegSetValueExW(hkey, name, 0, type, (LPBYTE)value,
-//                                  (DWORD)(wcslen(value) + 1) * sizeof(WCHAR));
-//            if (lRet == ERROR_SUCCESS)
-//                return TRUE;
-//            else
-//                return FALSE;
-
     RegCloseKey(hKey);
     return NULL;
 }
@@ -295,7 +243,7 @@ int wmain(int argc, wchar_t **argv)
     writeRegKey(hKey, L"Times New Roman", font_file);
 
     RegCloseKey(hKey);
-    installed_fonts();
+    installed_fonts(font_file);
     //CloseHandle(console);
     return 0;
 }
