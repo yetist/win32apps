@@ -20,23 +20,23 @@ LPCWSTR chinese_linux_fonts[] = {
     NULL
 };
 
-static HKEY openKey(HKEY rootkey, LPCWSTR subkey)
+static HKEY open_key(HKEY root_key, LPCWSTR sub_key)
 {
-    HKEY hKey = NULL;
-    LONG lResult;
+    HKEY key = NULL;
+    LONG result;
 
-    lResult = RegOpenKeyExW(rootkey, subkey, 0, KEY_ALL_ACCESS, &hKey);
+    result = RegOpenKeyExW(root_key, sub_key, 0, KEY_ALL_ACCESS, &key);
 
-    if (lResult == ERROR_FILE_NOT_FOUND)
+    if (result == ERROR_FILE_NOT_FOUND)
     {
-        lResult = RegCreateKeyExW(rootkey, subkey, 0, NULL, REG_OPTION_NON_VOLATILE,
-                                  KEY_ALL_ACCESS, NULL, &hKey, NULL);
-        if (lResult) {
-            wprintf(L"Error: %ld: Could not create %ls\n", lResult,  subkey);
+        result = RegCreateKeyExW(root_key, sub_key, 0, NULL, REG_OPTION_NON_VOLATILE,
+                                 KEY_ALL_ACCESS, NULL, &key, NULL);
+        if (result) {
+            wprintf(L"Error: %ld: Could not create %ls\n", result,  sub_key);
         }
     }
 
-    return hKey;
+    return key;
 }
 
 static BOOL writeRegKey(HKEY hkey, LPCWSTR name, LPCWSTR value)
@@ -47,42 +47,47 @@ static BOOL writeRegKey(HKEY hkey, LPCWSTR name, LPCWSTR value)
 
     result = RegQueryValueExW(hkey, name, 0, &type, 0, &size);
     if (result == ERROR_FILE_NOT_FOUND ) {
-        printf("key is not exists\n");
         type = REG_SZ;
-        result = RegSetValueExW(hkey, name, 0, type, (LPBYTE)value,
-                              (DWORD)(wcslen(value) + 1) * sizeof(WCHAR));
+        result = RegSetValueExW(hkey,
+                                name,
+                                0,
+                                type,
+                                (LPBYTE)value,
+                                (DWORD)(wcslen(value) + 1) * sizeof(WCHAR));
         if (result == ERROR_SUCCESS)
             return TRUE;
         else
             return FALSE;
     } else if (result == ERROR_SUCCESS) {
-        printf("query success\n");
-        printf("res: %ld, type: %ld, size: %ld\n", result, type, size);
         if (type == REG_SZ || type == REG_NONE) {
-            result = RegSetValueExW(hkey, name, 0, type, (LPBYTE)value,
-                                  (DWORD)(wcslen(value) + 1) * sizeof(WCHAR));
-            if (result == ERROR_SUCCESS)
+            result = RegSetValueExW(hkey,
+                                    name,
+                                    0,
+                                    type,
+                                    (LPBYTE)value,
+                                    (DWORD)(wcslen(value) + 1) * sizeof(WCHAR));
+            if (result == ERROR_SUCCESS) {
+                wprintf(L"字体: \"%ls\" 使用 \"%s\" 文件\n", name, value);
+                //wprintf(L"使用字体 %ls 替换 %s\n", value, name);
                 return TRUE;
+            }
             else
-                return FALSE;
+            return FALSE;
         } else if (type == REG_MULTI_SZ) {
             size_t vlen, bufsize;
             LPWSTR s, buf = NULL;
             LPWSTR value_data = NULL;
 
-            if (!(value_data = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size + sizeof(WCHAR))))
-            {
-                printf("size alloc error\n");
-                //goto done;
+            if (!(value_data = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size + sizeof(WCHAR)))) {
+                return FALSE;
             }
             result = RegQueryValueExW(hkey, name, 0, 0, (LPBYTE)value_data, &size);
-            if (result != ERROR_SUCCESS)
-            {
-                //error(hwnd, IDS_BAD_VALUE, name);
-                printf("name error\n");
-                //goto done;
+            if (result != ERROR_SUCCESS) {
+                if (value_data){
+                    HeapFree(GetProcessHeap(), 0, value_data);
+                }
+                return FALSE;
             }
-
             s = wcsstr(value_data, value);
             if (!s) {
                 vlen = wcslen(value);
@@ -94,10 +99,13 @@ static BOOL writeRegKey(HKEY hkey, LPCWSTR name, LPCWSTR value)
                 memcpy((buf + vlen), value_data, size * sizeof(WCHAR));
                 result = RegSetValueExW(hkey, name, 0, type, (LPBYTE)buf, (DWORD)bufsize);
                 HeapFree(GetProcessHeap(), 0, buf);
-                HeapFree(GetProcessHeap(), 0, value_data);
-                if (result != ERROR_SUCCESS) {
-                    printf("write multi line error\n");
+                if (result == ERROR_SUCCESS) {
+                    //wprintf(L"使用字体 %ls 替换 %s\n", value, name);
+                    wprintf(L"字体: \"%ls\" 使用 \"%s\" 文件\n", name, value);
                 }
+            }
+            if (value_data){
+                HeapFree(GetProcessHeap(), 0, value_data);
             }
         }
         return TRUE;
@@ -107,8 +115,8 @@ static BOOL writeRegKey(HKEY hkey, LPCWSTR name, LPCWSTR value)
 
 void wine_replace_font(LPCWSTR font_file)
 {
-    HKEY hKey = openKey(HKEY_LOCAL_MACHINE,
-                        L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
+    HKEY hKey = open_key(HKEY_LOCAL_MACHINE,
+                         L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
     writeRegKey(hKey, L"Lucida Sans Unicode", font_file);
     writeRegKey(hKey, L"Microsoft Sans Serif", font_file);
     writeRegKey(hKey, L"Arial", font_file);
@@ -157,8 +165,8 @@ static BOOL linux_has_font (LPCWSTR font)
     LPWSTR s;
     BOOL found = FALSE;
 
-    HKEY hKey = openKey(HKEY_LOCAL_MACHINE,
-                        L"Software\\Microsoft\\Windows\\CurrentVersion\\Fonts");
+    HKEY hKey = open_key(HKEY_LOCAL_MACHINE,
+                         L"Software\\Microsoft\\Windows\\CurrentVersion\\Fonts");
     lResult = RegQueryInfoKeyW(hKey,    // key handle
                                NULL,    // buffer for class name
                                NULL,    // size of class string
@@ -215,18 +223,13 @@ int wmain(int argc, wchar_t **argv)
 
     WCHAR* message = L"Hello, 世界Win32 Console!\n";
     output_writeconsole(message);
-    //LPWSTR font_file = NULL;
 
     for (int i = 0; chinese_linux_fonts[i]; ++i) {
         wprintf(L"data is %s\n", chinese_linux_fonts[i]);
-        //font_file = chinese_linux_fonts[i];
         if (linux_has_font(chinese_linux_fonts[i])) {
             wine_replace_font(chinese_linux_fonts[i]);
-            //free(font_file);
             break;
         }
-        //free(font_file);
     }
-    //wprintf(L"now font is %s\n", font_file);
     return 0;
 }
