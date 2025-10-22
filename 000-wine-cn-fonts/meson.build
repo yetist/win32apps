@@ -1,6 +1,13 @@
-project('winmaincpp', ['c', 'cpp'])
+project('winmaincpp', 'c')
 
 add_global_link_arguments('-municode', language:  ['c', 'cpp'])
+cc = meson.get_compiler('c')
 
-main = executable('main', 'main.c')
-test('main', main)
+root = meson.get_external_property('root')
+
+lib_shlwapi = cc.find_library('shlwapi',  dirs : [root])
+
+main= executable('main',
+    'main.c',
+    dependencies: [lib_shlwapi],
+)

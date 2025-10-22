@@ -9,9 +9,10 @@
 
 #include <windows.h>
 #include <wchar.h>
+#include <shlwapi.h>
 #include <stdio.h>
 
-LPWSTR chinese_fonts[] = {
+LPCWSTR chinese_linux_fonts[] = {
     L"wqy-microhei.ttc",
     L"wqy-zenhei.ttc",
     L"NotoSerifCJK-Regular.ttc",
@@ -40,49 +41,49 @@ static HKEY openKey(HKEY rootkey, LPCWSTR subkey)
 
 static BOOL writeRegKey(HKEY hkey, LPCWSTR name, LPCWSTR value)
 {
-    LONG lRet;
+    LONG result;
     DWORD type;
     DWORD size;
 
-    lRet = RegQueryValueExW(hkey, name, 0, &type, 0, &size);
-    if (lRet == ERROR_FILE_NOT_FOUND ) {
+    result = RegQueryValueExW(hkey, name, 0, &type, 0, &size);
+    if (result == ERROR_FILE_NOT_FOUND ) {
         printf("key is not exists\n");
         type = REG_SZ;
-        lRet = RegSetValueExW(hkey, name, 0, type, (LPBYTE)value,
+        result = RegSetValueExW(hkey, name, 0, type, (LPBYTE)value,
                               (DWORD)(wcslen(value) + 1) * sizeof(WCHAR));
-        if (lRet == ERROR_SUCCESS)
+        if (result == ERROR_SUCCESS)
             return TRUE;
         else
             return FALSE;
-    } else if (lRet == ERROR_SUCCESS) {
+    } else if (result == ERROR_SUCCESS) {
         printf("query success\n");
-        printf("res: %ld, type: %ld, size: %ld\n", lRet, type, size);
+        printf("res: %ld, type: %ld, size: %ld\n", result, type, size);
         if (type == REG_SZ || type == REG_NONE) {
-            lRet = RegSetValueExW(hkey, name, 0, type, (LPBYTE)value,
+            result = RegSetValueExW(hkey, name, 0, type, (LPBYTE)value,
                                   (DWORD)(wcslen(value) + 1) * sizeof(WCHAR));
-            if (lRet == ERROR_SUCCESS)
+            if (result == ERROR_SUCCESS)
                 return TRUE;
             else
                 return FALSE;
         } else if (type == REG_MULTI_SZ) {
             size_t vlen, bufsize;
             LPWSTR s, buf = NULL;
-            LPWSTR stringValueData = NULL;
+            LPWSTR value_data = NULL;
 
-            if (!(stringValueData = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size + sizeof(WCHAR))))
+            if (!(value_data = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size + sizeof(WCHAR))))
             {
                 printf("size alloc error\n");
                 //goto done;
             }
-            lRet = RegQueryValueExW(hkey, name, 0, 0, (LPBYTE)stringValueData, &size);
-            if (lRet != ERROR_SUCCESS)
+            result = RegQueryValueExW(hkey, name, 0, 0, (LPBYTE)value_data, &size);
+            if (result != ERROR_SUCCESS)
             {
                 //error(hwnd, IDS_BAD_VALUE, name);
                 printf("name error\n");
                 //goto done;
             }
 
-            s = wcsstr(stringValueData, value);
+            s = wcsstr(value_data, value);
             if (!s) {
                 vlen = wcslen(value);
                 bufsize = size + (vlen +1) * sizeof(WCHAR);
@@ -90,11 +91,11 @@ static BOOL writeRegKey(HKEY hkey, LPCWSTR name, LPCWSTR value)
 
                 memcpy(buf, value, vlen * sizeof(WCHAR));
                 buf[vlen++] = L'\0';
-                memcpy((buf + vlen), stringValueData, size * sizeof(WCHAR));
-                lRet = RegSetValueExW(hkey, name, 0, type, (LPBYTE)buf, (DWORD)bufsize);
+                memcpy((buf + vlen), value_data, size * sizeof(WCHAR));
+                result = RegSetValueExW(hkey, name, 0, type, (LPBYTE)buf, (DWORD)bufsize);
                 HeapFree(GetProcessHeap(), 0, buf);
-                HeapFree(GetProcessHeap(), 0, stringValueData);
-                if (lRet != ERROR_SUCCESS) {
+                HeapFree(GetProcessHeap(), 0, value_data);
+                if (result != ERROR_SUCCESS) {
                     printf("write multi line error\n");
                 }
             }
@@ -104,15 +105,20 @@ static BOOL writeRegKey(HKEY hkey, LPCWSTR name, LPCWSTR value)
     return TRUE;
 }
 
-void replace_font(LPCWSTR fontname, LPCWSTR fontfile)
+void wine_replace_font(LPCWSTR font_file)
 {
     HKEY hKey = openKey(HKEY_LOCAL_MACHINE,
                         L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
-    //WCHAR value[256];
-    //DWORD size = 0;
-    //getRegKey(hKey, fontname, value, size);
-    //wprintf(L"key: %s, size: %d", value, size);
-    writeRegKey(hKey, fontname, fontfile);
+    writeRegKey(hKey, L"Lucida Sans Unicode", font_file);
+    writeRegKey(hKey, L"Microsoft Sans Serif", font_file);
+    writeRegKey(hKey, L"Arial", font_file);
+    writeRegKey(hKey, L"Courier New", font_file);
+    writeRegKey(hKey, L"MS Sans Serif", font_file);
+    writeRegKey(hKey, L"NSimSun", font_file);
+    writeRegKey(hKey, L"SimSun", font_file);
+    writeRegKey(hKey, L"Tahoma", font_file);
+    writeRegKey(hKey, L"Times New Roman", font_file);
+
     RegCloseKey(hKey);
 }
 
@@ -139,83 +145,68 @@ static void output_writeconsole(LPCWSTR str)
     }
 }
 
-#define MAX_KEY_LENGTH 255
-#define MAX_VALUE_NAME 16383
 
-// Function to convert LPBYTE (assuming it's a null-terminated ANSI string) to wchar_t*
-wchar_t* ConvertLPBYTEToWChar(LPBYTE lpByteData)
+static BOOL linux_has_font (LPCWSTR font)
 {
-    if (!lpByteData)
-    {
-        return NULL;
-    }
-
-    // Calculate the required buffer size for the wide-character string
-    // CP_ACP specifies the system's default ANSI codepage
-    int requiredSize = MultiByteToWideChar(CP_ACP, 0, (LPCSTR)lpByteData, -1, NULL, 0);
-    if (requiredSize == 0)
-    {
-        return NULL;
-    }
-
-    // Allocate memory for the wide-character string
-    //wchar_t* wideCharString = new wchar_t[requiredSize];
-
-    wchar_t* wideCharString = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, requiredSize);
-    if (!wideCharString)
-    {
-        // Handle memory allocation error
-        return NULL;
-    }
-
-    // Perform the conversion
-    MultiByteToWideChar(CP_ACP, 0, (LPCSTR)lpByteData, -1, wideCharString, requiredSize);
-    return wideCharString;
-}
-
-
-static LPCWSTR installed_fonts(LPCWSTR font)
-{
-    DWORD c= 0;              // number of values for key
-    LONG  lResult;
+    DWORD c = 0;
+    LSTATUS lResult;
     WCHAR name[MAX_PATH];
     DWORD name_size;
     DWORD i, size, type;
     LPBYTE value = NULL;
     LPWSTR s;
+    BOOL found = FALSE;
 
     HKEY hKey = openKey(HKEY_LOCAL_MACHINE,
                         L"Software\\Microsoft\\Windows\\CurrentVersion\\Fonts");
-    lResult = RegQueryInfoKeyW(hKey,                    // key handle
-                               NULL,                // buffer for class name
-                               NULL,           // size of class string
-                               NULL,                    // reserved
-                               NULL,               // number of subkeys
-                               NULL,            // longest subkey size
-                               NULL,            // longest class string
-                               &c,                // number of values for this key
-                               NULL,            // longest value name
-                               NULL,         // longest value data
-                               NULL,   // security descriptor
-                               NULL);       // last write time
+    lResult = RegQueryInfoKeyW(hKey,    // key handle
+                               NULL,    // buffer for class name
+                               NULL,    // size of class string
+                               NULL,    // reserved
+                               NULL,    // number of subkeys
+                               NULL,    // longest subkey size
+                               NULL,    // longest class string
+                               &c,      // number of values for this key
+                               NULL,    // longest value name
+                               NULL,    // longest value data
+                               NULL,    // security descriptor
+                               NULL);   // last write time
+    if (lResult != ERROR_SUCCESS) {
+        if (hKey != NULL)
+            RegCloseKey(hKey);
+        return FALSE;
+    }
 
-    for(i = 0; i < c; i++)
-    {
+    for(i = 0; i < c; i++) {
         name_size = _countof(name);
         lResult = RegEnumValueW(hKey, i, name, &name_size, NULL, &type, NULL, &size);
         if (lResult == ERROR_SUCCESS)
         {
             value = malloc(size);
             lResult = RegQueryValueExW(hKey, name, NULL, &type, value, &size);
+            if (lResult != ERROR_SUCCESS) {
+                free(value);
+                continue;
+            }
             s = wcsstr((LPCWSTR)value, font);
             if (s) {
-                wprintf(L"found font: %ls\n", font);
+                if (PathFileExistsW((LPCWSTR)value)) {
+                    wprintf(L"found font: %ls\n", font);
+                    found = TRUE;
+                    free(value);
+                    break;
+                }
             }
             free(value);
         }
     }
-    RegCloseKey(hKey);
-    return NULL;
+
+    if (value != NULL)
+        free(value);
+
+    if (hKey != NULL)
+        RegCloseKey(hKey);
+    return found;
 }
 
 int wmain(int argc, wchar_t **argv)
@@ -224,26 +215,18 @@ int wmain(int argc, wchar_t **argv)
 
     WCHAR* message = L"Hello, 世界Win32 Console!\n";
     output_writeconsole(message);
+    //LPWSTR font_file = NULL;
 
-    WCHAR* font_file = L"wqy-microhei.ttc";
-    if (argc == 2) {
-        font_file = argv[1];
+    for (int i = 0; chinese_linux_fonts[i]; ++i) {
+        wprintf(L"data is %s\n", chinese_linux_fonts[i]);
+        //font_file = chinese_linux_fonts[i];
+        if (linux_has_font(chinese_linux_fonts[i])) {
+            wine_replace_font(chinese_linux_fonts[i]);
+            //free(font_file);
+            break;
+        }
+        //free(font_file);
     }
-
-    HKEY hKey = openKey(HKEY_LOCAL_MACHINE,
-                        L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
-    writeRegKey(hKey, L"Lucida Sans Unicode", font_file);
-    writeRegKey(hKey, L"Microsoft Sans Serif", font_file);
-    writeRegKey(hKey, L"Arial", font_file);
-    writeRegKey(hKey, L"Courier New", font_file);
-    writeRegKey(hKey, L"MS Sans Serif", font_file);
-    writeRegKey(hKey, L"NSimSun", font_file);
-    writeRegKey(hKey, L"SimSun", font_file);
-    writeRegKey(hKey, L"Tahoma", font_file);
-    writeRegKey(hKey, L"Times New Roman", font_file);
-
-    RegCloseKey(hKey);
-    installed_fonts(font_file);
-    //CloseHandle(console);
+    //wprintf(L"now font is %s\n", font_file);
     return 0;
 }
