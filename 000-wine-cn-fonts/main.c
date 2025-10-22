@@ -116,11 +116,11 @@ void replace_font(LPCWSTR fontname, LPCWSTR fontfile)
     RegCloseKey(hKey);
 }
 
-static void output_writeconsole(const WCHAR *str, DWORD wlen)
+static void output_writeconsole(const WCHAR *str)
 {
     DWORD count;
 
-    if (!WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str, wlen, &count, NULL))
+    if (!WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str, wcslen(str), &count, NULL))
     {
         DWORD len;
         char  *msgA;
@@ -128,11 +128,12 @@ static void output_writeconsole(const WCHAR *str, DWORD wlen)
         /* WriteConsole() fails on Windows if its output is redirected. If this occurs,
          * we should call WriteFile() with OEM code page.
          */
-        len = WideCharToMultiByte(GetOEMCP(), 0, str, wlen, NULL, 0, NULL, NULL);
+        len = WideCharToMultiByte(GetOEMCP(), 0, str, wcslen(str), NULL, 0, NULL, NULL);
         msgA = malloc(len);
-        if (!msgA) return;
+        if (!msgA)
+            return;
 
-        WideCharToMultiByte(GetOEMCP(), 0, str, wlen, msgA, len, NULL, NULL);
+        WideCharToMultiByte(GetOEMCP(), 0, str, wcslen(str), msgA, len, NULL, NULL);
         WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), msgA, len, &count, FALSE);
         free(msgA);
     }
@@ -147,8 +148,7 @@ static LPCWSTR installed_fonts()
 //    DWORD    cbName = 0;                   // size of name string
 //    DWORD    cchClassName = MAX_PATH;  // size of class string
 
-    DWORD    cSubKeys = 0;               // number of subkeys
-    DWORD    cValues = 0;              // number of values for key
+    DWORD    c= 0;              // number of values for key
 
 //    DWORD    cbMaxSubKey = 0;              // longest subkey size
 //    DWORD    cchMaxClass = 0;              // longest class string
@@ -158,50 +158,50 @@ static LPCWSTR installed_fonts()
 //    DWORD    cbMaxValueData = 0;       // longest value data
 //    DWORD    cbSecurityDescriptor = 0; // size of security descriptor
 //    FILETIME ftLastWriteTime;      // last write time
-//
-    DWORD i = 0, j = 0, retCode = 0;
-//
-//    WCHAR  achValue[MAX_VALUE_NAME] = {'\0'};
-//    DWORD cchValue = MAX_VALUE_NAME;
-    //LPWSTR chinese_fonts[]
+
+    LONG lResult;
+
     HKEY hKey = openKey(HKEY_LOCAL_MACHINE,
                         L"Software\\Microsoft\\Windows\\CurrentVersion\\Fonts");
-    retCode = RegQueryInfoKeyW(hKey,                    // key handle
+    lResult = RegQueryInfoKeyW(hKey,                    // key handle
                               NULL,                // buffer for class name
                               NULL,           // size of class string
                               NULL,                    // reserved
-                              &cSubKeys,               // number of subkeys
+                              NULL,               // number of subkeys
                               NULL,            // longest subkey size
                               NULL,            // longest class string
-                              &cValues,                // number of values for this key
+                              &c,                // number of values for this key
                               NULL,            // longest value name
                               NULL,         // longest value data
                               NULL,   // security descriptor
                               NULL);       // last write time
 
-    wprintf(L"Keys: %d, Values: %d\n", cSubKeys, cValues);
-    printf("Keys: %ld, Values: %ld\n", cSubKeys, cValues);
+    //wprintf(L"Keys: %d, Values: %d\n", cSubKeys, cValues);
+    printf("Values: %ld\n", c);
+
+    WCHAR s_szName[MAX_PATH];
+    DWORD s_cchName;
+    DWORD i, cb, type;
+    /* Retrieve the value names associated with the current key */
+    for(i = 0; i < c; i++)
+    {
+        s_cchName = _countof(s_szName);
+        lResult = RegEnumValueW(hKey, i, s_szName, &s_cchName, NULL, NULL, NULL, &cb);
+
+//      lResult = RegEnumValueW(hKey, i, szValueName, &cbName, NULL, &dwType, szValueData, &cbData);
+        if (lResult != ERROR_SUCCESS)
+            goto done;
+        //if (s_cchName >= _countof(s_szName))
+        //    continue;
+        output_writeconsole(s_szName);
+        output_writeconsole(L"\n");
+        //ppszNames[i] = _wcsdup(s_szName);
+    }
 
 //    LONG lResult;
 //    DWORD dwIndex, dwType, cbName, cbData;
 //    FILETIME ft;
 //    WCHAR szSubKey[256];
-//    /* copy all subkeys */
-//    dwIndex = 0;
-//    do
-//    {
-//        cbName = ARRAYSIZE(szSubKey);
-//        lResult = RegEnumKeyExW(hKey, dwIndex++, szSubKey, &cbName, NULL, NULL, NULL, &ft);
-//        if (lResult == ERROR_SUCCESS)
-//        {
-//            output_writeconsole(szSubKey, wcslen(szSubKey));
-//            output_writeconsole(cbName, wcslen(cbName));
-//            //lResult = CopyKey(hDestSubKey, szSubKey, hSrcKey, szSubKey);
-//            if (lResult)
-//                goto done;
-//        }
-//    } while(lResult == ERROR_SUCCESS);
-//
 //
 //    dwIndex = 0;
 //    do
@@ -274,24 +274,8 @@ int wmain(int argc, wchar_t **argv)
 {
     SetConsoleOutputCP(65001);
 
-    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    if (console == INVALID_HANDLE_VALUE) {
-        wprintf(L"Cannot retrieve standard output handle\n (%d)", GetLastError());
-    }
-
-//    wprintf(L"中argc: %d, 0=%ls\n", argc, argv[0]);
-//    //wprintf(L"%s\n", _T("中文字体更新成功"));
-//    //WriteConsoleW(console, L"您好\n", wcslen(argv[1]), cChars, NULL);
-//    wprintf(L"argc: %d, 0=%ls\n", argc, argv[0]);
-//    wprintf(L"您好\n");
-
     WCHAR* message = L"Hello, 世界Win32 Console!\n";
-    DWORD outlen;
-
-    // Write the string to the console
-    WriteConsole(console, message, wcslen(message), &outlen, NULL);
-    output_writeconsole(message, wcslen(message));
+    output_writeconsole(message);
 
     WCHAR* font_file = L"wqy-microhei.ttc";
     if (argc == 2) {
@@ -300,7 +284,6 @@ int wmain(int argc, wchar_t **argv)
 
     HKEY hKey = openKey(HKEY_LOCAL_MACHINE,
                         L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
-    //writeRegKey(hKey, fontname, fontfile);
     writeRegKey(hKey, L"Lucida Sans Unicode", font_file);
     writeRegKey(hKey, L"Microsoft Sans Serif", font_file);
     writeRegKey(hKey, L"Arial", font_file);
@@ -312,7 +295,7 @@ int wmain(int argc, wchar_t **argv)
     writeRegKey(hKey, L"Times New Roman", font_file);
 
     RegCloseKey(hKey);
-    CloseHandle(console);
     installed_fonts();
+    //CloseHandle(console);
     return 0;
 }

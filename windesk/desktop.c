@@ -69,8 +69,8 @@ static BOOL set_auto_restart(BOOL enable)
     long lRet;
     DWORD value = 0;
 
-//    if (enable)
-//        value = 1;
+    //    if (enable)
+    //        value = 1;
 
     if(RegOpenKeyExA(HKEY_LOCAL_MACHINE, REG_PATH, 0, KEY_WRITE, &hKey) == ERROR_SUCCESS) {
         lRet = RegSetValueExA(hKey, "AutoRestartShell", 0, REG_DWORD, (const BYTE*)&value, sizeof(value));
@@ -85,11 +85,11 @@ static BOOL set_auto_restart(BOOL enable)
 
 static char* get_login_shell(void)
 {
-	char buf[1024] = {0};
+    char buf[1024] = {0};
 
-	if (getRegKey(HKEY_LOCAL_MACHINE, REG_PATH, "Shell", buf, sizeof(buf))) {
+    if (getRegKey(HKEY_LOCAL_MACHINE, REG_PATH, "Shell", buf, sizeof(buf))) {
         return strdup(buf);
-	}
+    }
     return NULL;
 }
 
@@ -157,9 +157,9 @@ BOOL start_desktop(void)
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
 
-	ZeroMemory(&si,sizeof(si));
+    ZeroMemory(&si,sizeof(si));
     si.cb = sizeof(si);
-	ZeroMemory(&pi,sizeof(pi));
+    ZeroMemory(&pi,sizeof(pi));
 
     // Start the child process.
     if(!CreateProcess(NULL,                    // No module name (use command line)
@@ -183,13 +183,13 @@ BOOL start_desktop(void)
     // Close process and thread handles.
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
-	return TRUE;
+    return TRUE;
 }
 
 void hide_desktop(void)
 {
     char *myself = NULL;
-	char *shell = NULL;
+    char *shell = NULL;
 
     shell = get_login_shell();
     if (shell == NULL) {
