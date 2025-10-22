@@ -20,7 +20,7 @@ LPCWSTR chinese_linux_fonts[] = {
     NULL
 };
 
-static HKEY open_key(HKEY root_key, LPCWSTR sub_key)
+static HKEY open_reg_key(HKEY root_key, LPCWSTR sub_key)
 {
     HKEY key = NULL;
     LONG result;
@@ -115,19 +115,19 @@ static BOOL write_reg_key(HKEY hkey, LPCWSTR name, LPCWSTR value)
 
 void wine_replace_font(LPCWSTR font_file)
 {
-    HKEY hKey = open_key(HKEY_LOCAL_MACHINE,
-                         L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
-    write_reg_key(hKey, L"Lucida Sans Unicode", font_file);
-    write_reg_key(hKey, L"Microsoft Sans Serif", font_file);
-    write_reg_key(hKey, L"Arial", font_file);
-    write_reg_key(hKey, L"Courier New", font_file);
-    write_reg_key(hKey, L"MS Sans Serif", font_file);
-    write_reg_key(hKey, L"NSimSun", font_file);
-    write_reg_key(hKey, L"SimSun", font_file);
-    write_reg_key(hKey, L"Tahoma", font_file);
-    write_reg_key(hKey, L"Times New Roman", font_file);
+    HKEY key = open_reg_key(HKEY_LOCAL_MACHINE,
+                            L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
+    write_reg_key(key, L"Lucida Sans Unicode", font_file);
+    write_reg_key(key, L"Microsoft Sans Serif", font_file);
+    write_reg_key(key, L"Arial", font_file);
+    write_reg_key(key, L"Courier New", font_file);
+    write_reg_key(key, L"MS Sans Serif", font_file);
+    write_reg_key(key, L"NSimSun", font_file);
+    write_reg_key(key, L"SimSun", font_file);
+    write_reg_key(key, L"Tahoma", font_file);
+    write_reg_key(key, L"Times New Roman", font_file);
 
-    RegCloseKey(hKey);
+    RegCloseKey(key);
 }
 
 static void output_writeconsole(LPCWSTR str)
@@ -165,9 +165,9 @@ static BOOL linux_has_font (LPCWSTR font)
     LPWSTR s;
     BOOL found = FALSE;
 
-    HKEY hKey = open_key(HKEY_LOCAL_MACHINE,
-                         L"Software\\Microsoft\\Windows\\CurrentVersion\\Fonts");
-    lResult = RegQueryInfoKeyW(hKey,    // key handle
+    HKEY key = open_reg_key(HKEY_LOCAL_MACHINE,
+                            L"Software\\Microsoft\\Windows\\CurrentVersion\\Fonts");
+    lResult = RegQueryInfoKeyW(key,    // key handle
                                NULL,    // buffer for class name
                                NULL,    // size of class string
                                NULL,    // reserved
@@ -180,18 +180,18 @@ static BOOL linux_has_font (LPCWSTR font)
                                NULL,    // security descriptor
                                NULL);   // last write time
     if (lResult != ERROR_SUCCESS) {
-        if (hKey != NULL)
-            RegCloseKey(hKey);
+        if (key != NULL)
+            RegCloseKey(key);
         return FALSE;
     }
 
     for(i = 0; i < c; i++) {
         name_size = _countof(name);
-        lResult = RegEnumValueW(hKey, i, name, &name_size, NULL, &type, NULL, &size);
+        lResult = RegEnumValueW(key, i, name, &name_size, NULL, &type, NULL, &size);
         if (lResult == ERROR_SUCCESS)
         {
             value = malloc(size);
-            lResult = RegQueryValueExW(hKey, name, NULL, &type, value, &size);
+            lResult = RegQueryValueExW(key, name, NULL, &type, value, &size);
             if (lResult != ERROR_SUCCESS) {
                 free(value);
                 continue;
@@ -199,7 +199,6 @@ static BOOL linux_has_font (LPCWSTR font)
             s = wcsstr((LPCWSTR)value, font);
             if (s) {
                 if (PathFileExistsW((LPCWSTR)value)) {
-                    wprintf(L"found font: %ls\n", font);
                     found = TRUE;
                     free(value);
                     break;
@@ -212,8 +211,8 @@ static BOOL linux_has_font (LPCWSTR font)
     if (value != NULL)
         free(value);
 
-    if (hKey != NULL)
-        RegCloseKey(hKey);
+    if (key != NULL)
+        RegCloseKey(key);
     return found;
 }
 
