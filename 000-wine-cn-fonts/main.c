@@ -39,7 +39,7 @@ static HKEY open_key(HKEY root_key, LPCWSTR sub_key)
     return key;
 }
 
-static BOOL writeRegKey(HKEY hkey, LPCWSTR name, LPCWSTR value)
+static BOOL write_reg_key(HKEY hkey, LPCWSTR name, LPCWSTR value)
 {
     LONG result;
     DWORD type;
@@ -117,15 +117,15 @@ void wine_replace_font(LPCWSTR font_file)
 {
     HKEY hKey = open_key(HKEY_LOCAL_MACHINE,
                          L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
-    writeRegKey(hKey, L"Lucida Sans Unicode", font_file);
-    writeRegKey(hKey, L"Microsoft Sans Serif", font_file);
-    writeRegKey(hKey, L"Arial", font_file);
-    writeRegKey(hKey, L"Courier New", font_file);
-    writeRegKey(hKey, L"MS Sans Serif", font_file);
-    writeRegKey(hKey, L"NSimSun", font_file);
-    writeRegKey(hKey, L"SimSun", font_file);
-    writeRegKey(hKey, L"Tahoma", font_file);
-    writeRegKey(hKey, L"Times New Roman", font_file);
+    write_reg_key(hKey, L"Lucida Sans Unicode", font_file);
+    write_reg_key(hKey, L"Microsoft Sans Serif", font_file);
+    write_reg_key(hKey, L"Arial", font_file);
+    write_reg_key(hKey, L"Courier New", font_file);
+    write_reg_key(hKey, L"MS Sans Serif", font_file);
+    write_reg_key(hKey, L"NSimSun", font_file);
+    write_reg_key(hKey, L"SimSun", font_file);
+    write_reg_key(hKey, L"Tahoma", font_file);
+    write_reg_key(hKey, L"Times New Roman", font_file);
 
     RegCloseKey(hKey);
 }
