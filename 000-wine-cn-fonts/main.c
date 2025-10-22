@@ -2,15 +2,9 @@
  * SPDX-FileCopyrightText: Copyright (c) 2025 yetist <yetist@gmail.com>
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
-
-#ifndef UNICODE
-#define UNICODE
-#endif
-
 #include <windows.h>
 #include <wchar.h>
 #include <shlwapi.h>
-#include <stdio.h>
 
 LPCWSTR chinese_linux_fonts[] = {
     L"wqy-microhei.ttc",
@@ -19,6 +13,35 @@ LPCWSTR chinese_linux_fonts[] = {
     L"SourceHanSansCN-Normal.otf",
     NULL
 };
+
+static void console_printf (LPCWSTR format, ...)
+{
+    DWORD count;
+    WCHAR buf[1024];
+    va_list arg_list;
+
+    va_start (arg_list, format) ;
+    vsnwprintf (buf, sizeof(buf) / sizeof (WCHAR), format, arg_list);
+    va_end (arg_list) ;
+
+    if (!WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), buf, wcslen(buf), &count, NULL))
+    {
+        DWORD len;
+        char  *msg;
+
+        /* WriteConsole() fails on Windows if its output is redirected. If this occurs,
+         * we should call WriteFile() with OEM code page.
+         */
+        len = WideCharToMultiByte(GetOEMCP(), 0, buf, wcslen(buf), NULL, 0, NULL, NULL);
+        msg = malloc(len);
+        if (!msg)
+            return;
+
+        WideCharToMultiByte(GetOEMCP(), 0, buf, wcslen(buf), msg, len, NULL, NULL);
+        WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), msg, len, &count, FALSE);
+        free(msg);
+    }
+}
 
 static HKEY open_reg_key(HKEY root_key, LPCWSTR sub_key)
 {
@@ -32,7 +55,7 @@ static HKEY open_reg_key(HKEY root_key, LPCWSTR sub_key)
         result = RegCreateKeyExW(root_key, sub_key, 0, NULL, REG_OPTION_NON_VOLATILE,
                                  KEY_ALL_ACCESS, NULL, &key, NULL);
         if (result) {
-            wprintf(L"Error: %ld: Could not create %ls\n", result,  sub_key);
+            console_printf(L"Error: %ld: Could not create %ls\n", result,  sub_key);
         }
     }
 
@@ -67,15 +90,13 @@ static BOOL write_reg_key(HKEY hkey, LPCWSTR name, LPCWSTR value)
                                     (LPBYTE)value,
                                     (DWORD)(wcslen(value) + 1) * sizeof(WCHAR));
             if (result == ERROR_SUCCESS) {
-                wprintf(L"字体: \"%ls\" 使用 \"%s\" 文件\n", name, value);
-                //wprintf(L"使用字体 %ls 替换 %s\n", value, name);
                 return TRUE;
+            } else {
+                return FALSE;
             }
-            else
-            return FALSE;
         } else if (type == REG_MULTI_SZ) {
             size_t vlen, bufsize;
-            LPWSTR s, buf = NULL;
+            LPWSTR s = NULL, buf = NULL;
             LPWSTR value_data = NULL;
 
             if (!(value_data = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size + sizeof(WCHAR)))) {
@@ -89,7 +110,7 @@ static BOOL write_reg_key(HKEY hkey, LPCWSTR name, LPCWSTR value)
                 return FALSE;
             }
             s = wcsstr(value_data, value);
-            if (!s) {
+            if (s == NULL) {
                 vlen = wcslen(value);
                 bufsize = size + (vlen +1) * sizeof(WCHAR);
                 buf = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, bufsize);
@@ -99,60 +120,19 @@ static BOOL write_reg_key(HKEY hkey, LPCWSTR name, LPCWSTR value)
                 memcpy((buf + vlen), value_data, size * sizeof(WCHAR));
                 result = RegSetValueExW(hkey, name, 0, type, (LPBYTE)buf, (DWORD)bufsize);
                 HeapFree(GetProcessHeap(), 0, buf);
-                if (result == ERROR_SUCCESS) {
-                    //wprintf(L"使用字体 %ls 替换 %s\n", value, name);
-                    wprintf(L"字体: \"%ls\" 使用 \"%s\" 文件\n", name, value);
+                if (result != ERROR_SUCCESS) {
+                    if (value_data)
+                        HeapFree(GetProcessHeap(), 0, value_data);
+                    return FALSE;
                 }
             }
             if (value_data){
                 HeapFree(GetProcessHeap(), 0, value_data);
             }
         }
-        return TRUE;
     }
     return TRUE;
 }
-
-void wine_replace_font(LPCWSTR font_file)
-{
-    HKEY key = open_reg_key(HKEY_LOCAL_MACHINE,
-                            L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
-    write_reg_key(key, L"Lucida Sans Unicode", font_file);
-    write_reg_key(key, L"Microsoft Sans Serif", font_file);
-    write_reg_key(key, L"Arial", font_file);
-    write_reg_key(key, L"Courier New", font_file);
-    write_reg_key(key, L"MS Sans Serif", font_file);
-    write_reg_key(key, L"NSimSun", font_file);
-    write_reg_key(key, L"SimSun", font_file);
-    write_reg_key(key, L"Tahoma", font_file);
-    write_reg_key(key, L"Times New Roman", font_file);
-
-    RegCloseKey(key);
-}
-
-static void output_writeconsole(LPCWSTR str)
-{
-    DWORD count;
-
-    if (!WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str, wcslen(str), &count, NULL))
-    {
-        DWORD len;
-        char  *msgA;
-
-        /* WriteConsole() fails on Windows if its output is redirected. If this occurs,
-         * we should call WriteFile() with OEM code page.
-         */
-        len = WideCharToMultiByte(GetOEMCP(), 0, str, wcslen(str), NULL, 0, NULL, NULL);
-        msgA = malloc(len);
-        if (!msgA)
-            return;
-
-        WideCharToMultiByte(GetOEMCP(), 0, str, wcslen(str), msgA, len, NULL, NULL);
-        WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), msgA, len, &count, FALSE);
-        free(msgA);
-    }
-}
-
 
 static BOOL linux_has_font (LPCWSTR font)
 {
@@ -216,17 +196,41 @@ static BOOL linux_has_font (LPCWSTR font)
     return found;
 }
 
+static void wine_systemlink_font(LPCWSTR font_file)
+{
+    int i = 0;
+    HKEY key;
+
+    LPCWSTR link_font_names [] = {
+        L"Arial",
+        L"Courier New",
+        L"Lucida Sans Unicode",
+        L"MS Sans Serif",
+        L"Microsoft Sans Serif",
+        L"NSimSun",
+        L"SimSun",
+        L"Tahoma",
+        L"Times New Roman",
+        NULL
+    };
+
+    key = open_reg_key(HKEY_LOCAL_MACHINE,
+                       L"Software\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink");
+    for (i = 0; link_font_names[i]; i++) {
+        if (write_reg_key(key, link_font_names[i], font_file)) {
+            console_printf(L"字体 \"%ls\" 链接为 \"%s\" 文件\n", link_font_names[i], font_file);
+        }
+    }
+    RegCloseKey(key);
+}
+
 int wmain(int argc, wchar_t **argv)
 {
     SetConsoleOutputCP(65001);
 
-    WCHAR* message = L"Hello, 世界Win32 Console!\n";
-    output_writeconsole(message);
-
     for (int i = 0; chinese_linux_fonts[i]; ++i) {
-        wprintf(L"data is %s\n", chinese_linux_fonts[i]);
         if (linux_has_font(chinese_linux_fonts[i])) {
-            wine_replace_font(chinese_linux_fonts[i]);
+            wine_systemlink_font(chinese_linux_fonts[i]);
             break;
         }
     }
