@@ -1,0 +1,46 @@
+#include <windows.h>
+#include "pixelset.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+PIXELSETICON  ICON  DISCARDABLE	"PixelSet.ico"
+SMALL	      ICON  DISCARDABLE "small.ico"
+
+
+PIXELSETMENU MENU DISCARDABLE
+BEGIN
+  POPUP "点集(&P)"
+  BEGIN
+    MENUITEM "缩小(&Z)\tCtrl+Z",  IDM_ZOOMIN
+    MENUITEM SEPARATOR
+    MENUITEM "退出(&X)",	  IDM_EXIT
+  END
+  POPUP "帮助(&H)"
+  BEGIN
+    MENUITEM "关于(&A)...\tF1",	  IDM_ABOUT
+  END
+END
+
+// Dialog
+ABOUTBOX DIALOG DISCARDABLE 20, 25, 124, 77
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "关于画点的示范程序"
+FONT 14, "宋体"
+BEGIN
+    PUSHBUTTON    "确定",             IDOK,       46, 56, 40, 14
+    CTEXT         "本示例通过画点实现Mandelbrot点集", IDC_STATIC, 22, 9, 92, 15
+    CTEXT         "XXX编写",          IDC_STATIC, 30, 34, 76, 10, NOT WS_GROUP
+    CTEXT         "一九九六年九月",   IDC_STATIC, 36, 45, 65, 8,  NOT WS_GROUP
+    ICON          "RCICON",	      IDC_STATIC, 11, 23, 18, 20
+    CONTROL       "",                 IDC_STATIC, "Static", SS_BLACKFRAME, 40, 44, 56, 1
+END
+
+/* Accelerator */
+PIXELSETMENU ACCELERATORS DISCARDABLE
+BEGIN
+    VK_F1,      IDM_ABOUT,            VIRTKEY, NOINVERT
+    "^Z",       IDM_ZOOMIN,	      ASCII, NOINVERT
+END
+
+GETCOLOR    CURSOR    DISCARDABLE     "GetColor.cur"
