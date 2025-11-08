@@ -4,4 +4,4 @@
 // 资源文件是utf8编码
 #pragma code_page(65001)
 
-SMALL       ICON DISCARDABLE "small.ico"
+SMALL ICON DISCARDABLE "small.ico"

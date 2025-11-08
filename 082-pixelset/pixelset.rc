@@ -4,10 +4,6 @@
 // 资源文件是utf8编码
 #pragma code_page(65001)
 
-PIXELSETICON  ICON  DISCARDABLE	"PixelSet.ico"
-SMALL	      ICON  DISCARDABLE "small.ico"
-
-
 PIXELSETMENU MENU DISCARDABLE
 BEGIN
   POPUP "点集(&P)"
@@ -42,5 +38,3 @@ BEGIN
     VK_F1,      IDM_ABOUT,            VIRTKEY, NOINVERT
     "^Z",       IDM_ZOOMIN,	      ASCII, NOINVERT
 END
-
-GETCOLOR    CURSOR    DISCARDABLE     "GetColor.cur"

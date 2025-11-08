@@ -91,9 +91,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 }
 
 LRESULT APIENTRY MainWndProc(HWND hWnd,         // 窗口句柄
-        UINT message,          // 消息类型
-        WPARAM wParam,     // 消息附带信息
-        LPARAM lParam)     // 消息附带信息
+                             UINT message,          // 消息类型
+                             WPARAM wParam,     // 消息附带信息
+                             LPARAM lParam)     // 消息附带信息
 {
     HDC hdc, hMemDc;
     PAINTSTRUCT ps;

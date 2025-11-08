@@ -7,6 +7,7 @@
 
 //菜单命令
 //【文件】菜单
+
 #define IDM_ZOOMIN  100
 #define IDM_EXIT   101
 //【帮助】菜单

@@ -3,7 +3,6 @@
  * Copyright (c) 2025 yetist <yetist@gmail.com>
  */
 
-
 //目的:通过使用画点函数,绘制Mandelbrot 点集
 #include <windows.h>
 #include <string.h>
@@ -45,8 +44,8 @@ BOOL InitApplication(HINSTANCE hInstance)
     wcex.hCursor       = LoadCursor(NULL, IDC_ARROW);
     wcex.hbrBackground = GetStockObject(WHITE_BRUSH);
     wcex.lpszMenuName  = L"PixelSetMenu";
-    wcex.lpszClassName = L"MyPixelWClass";
-    wcex.hIconSm       = LoadIcon(hInstance, L"Small");
+    wcex.lpszClassName = L"PixelSetWClass";
+    wcex.hIconSm       = LoadIcon(hInstance, IDI_WINLOGO);
 
     return RegisterClassEx(&wcex);
 }
@@ -107,7 +106,7 @@ LRESULT APIENTRY MainWndProc(HWND hWnd,
             EndPaint(hWnd, &ps);
             break;
         case WM_RBUTTONDOWN:
-            hCursor = LoadCursor(hInst, L"GetColor");
+            hCursor = LoadCursor(hInst, IDC_IBEAM);
             SetCursor(hCursor);
 
             break;
@@ -149,7 +148,7 @@ LRESULT APIENTRY MainWndProc(HWND hWnd,
                 PMax = newPMax;
                 PMin = newPMin;
             } else {
-                PMax = newPMax;
+                PMax = newPMin;
                 PMin = newPMax;
             }
 
@@ -168,7 +167,7 @@ LRESULT APIENTRY MainWndProc(HWND hWnd,
         case WM_MOUSEMOVE:
             if(wParam & MK_RBUTTON)
             {
-                hCursor = LoadCursor(hInst, L"GetColor");
+                hCursor = LoadCursor(hInst, IDC_IBEAM);
                 SetCursor(hCursor);
             } else if (wParam & MK_LBUTTON)
             {
@@ -187,27 +186,27 @@ LRESULT APIENTRY MainWndProc(HWND hWnd,
             }
             break;
         case WM_COMMAND:
+            switch(LOWORD(wParam))
             {
-                switch(LOWORD(wParam))
-                {
-                    case IDM_ZOOMIN:
-                        newPMin = 4 * PMin - 3 * PMax;
-                        newQMin = 4 * QMin - 3 * QMax;
-                        newPMax = 4 * PMax - 3 * PMin;
+                case IDM_ZOOMIN:
+                    newPMin = 4 * PMin - 3 * PMax;
+                    newQMin = 4 * QMin - 3 * QMax;
+                    newPMax = 4 * PMax - 3 * PMin;
 
-                        PMin = newPMin;
-                        PMax = newPMax;
-                        QMin = newQMin;
+                    PMin = newPMin;
+                    PMax = newPMax;
+                    QMin = newQMin;
 
-                        InvalidateRect(hWnd, NULL, TRUE);
-                        break;
-                    case IDM_EXIT:
-                        PostQuitMessage(0);
-                        break;
-                    case IDM_ABOUT:
-                        DialogBox(hInst, L"AboutBox", hWnd, (DLGPROC) About);
-                        break;
-                }
+                    InvalidateRect(hWnd, NULL, TRUE);
+                    break;
+                case IDM_EXIT:
+                    PostQuitMessage(0);
+                    break;
+                case IDM_ABOUT:
+                    DialogBox(hInst, L"AboutBox", hWnd, (DLGPROC) About);
+                    break;
+                default:
+                    return (DefWindowProc(hWnd, message, wParam, lParam));
             }
             break;
         case WM_DESTROY:
