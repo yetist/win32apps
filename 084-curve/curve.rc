@@ -1,0 +1,34 @@
+#include <windows.h>
+#include "curve.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+// 菜单
+BEZIERCURVEMENU MENU DISCARDABLE
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "打开(&O)", IDM_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "退出(&X)", IDM_EXIT
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "关于(&A)...", IDM_ABOUT
+    END
+END
+
+// 对话框
+ABOUTBOX DIALOG DISCARDABLE 20, 25, 124, 77
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "关于绘制曲线的示范程序"
+FONT 14, "隶书_GB2312"
+BEGIN
+    PUSHBUTTON "确定", IDOK, 43,51,40,14
+    CTEXT "贝塞尔曲线绘制示范程序", IDC_STATIC, 22,9,92,8
+    CTEXT "作者", IDC_STATIC, 30,24,76,10, NOT WS_GROUP
+    CTEXT "", IDC_STATIC,36,37,65,8, NOT WS_GROUP
+    ICON IDI_WINLOGO, IDC_STATIC,11,23,18,20
+    CONTROL "", IDC_STATIC, "Static", SS_BLACKFRAME, 40,34,56,1
+END

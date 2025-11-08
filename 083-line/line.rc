@@ -1,0 +1,6 @@
+#include <windows.h>
+#include "line.h"
+
+// Icon
+LINEICON        ICON DISCARDABLE "line.ico"
+LINESMALLICON   ICON DISCARDABLE "small.ico"
