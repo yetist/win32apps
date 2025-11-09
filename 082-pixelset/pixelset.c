@@ -9,9 +9,13 @@
 #include <math.h>
 #include "pixelset.h"
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance,
+                     HINSTANCE hPrevInstance,
+                     LPSTR lpCmdLine,
+                     int nCmdShow)
 {
     MSG msg;
+    HACCEL hAccel;
 
     if (!InitApplication(hInstance))
         return FALSE;
@@ -19,11 +23,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if (!InitInstance(hInstance, nCmdShow))
         return FALSE;
 
-    LoadAccelerators(hInstance, L"PixelSetMenu");
+    hAccel = LoadAccelerators(hInstance, L"PixelSetMenu");
 
-    while (GetMessage(&msg, NULL, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        if (!TranslateAccelerator(hWndMain, hAccel, &msg))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
     }
 
     return msg.wParam;
