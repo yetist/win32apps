@@ -1,0 +1,57 @@
+// 菜单命令
+// [文件]菜单
+#define IDM_EXIT 200
+
+// [编辑]菜单
+#define IDM_EDITUNDO 210
+#define IDM_EDITCUT 211
+#define IDM_EDITCOPY 212
+#define IDM_EDITPASTE 213
+#define IDM_EDITDELETE 214
+#define IDM_EDITSELECTALL 215
+
+// [查看] 菜单
+#define IDM_SHOWTOOLBAR 220
+#define IDM_SHOWSTATUSBAR 221
+
+//[格式] 菜单
+#define IDM_ALIGNLEFT 230
+#define IDM_ALIGNCENTER 231
+#define IDM_ALIGNRIGHT 232
+
+// [字体] 菜单
+#define IDM_SELECTFONTFACE 240
+#define IDM_SELECTFONTSTYLE 241
+#define IDM_SMALLFONTSIZE 250
+#define IDM_NORMALFONTSIZE 251
+#define IDM_LARGEFONTSIZE 252
+#define IDM_FONTBLACK 260
+#define IDM_FONTRED     261
+#define IDM_FONTGREEN 262
+#define IDM_FONTBLUE 263
+#define IDM_FONTYELLOW  264
+#define IDM_FONTGRAY 265
+
+// [帮助] 菜单
+#define IDM_ABOUT 300
+#define IDM_BOLD  100
+#define IDM_ITALIC 101
+#define IDM_UNDERLINE 102
+#define IDM_STRIKEOUT 103
+
+// 全局变量说明
+HINSTANCE hInst;
+HWND hWndToolbar;
+
+// 函数原型说明
+// 过程
+LRESULT APIENTRY MainWndProc(HWND, UINT, WPARAM, LPARAM);
+BOOL APIENTRY About(HWND, UINT, WPARAM, LPARAM);
+
+// 函 数
+BOOL InitApplication (HINSTANCE);
+BOOL InitInstance (HINSTANCE, int);
+VOID HandleTrackPopupMenu(HWND, LPCTSTR, POINT);
+VOID InitAlignMenu(HWND);
+VOID InitTrackPopupMenu(HMENU, HMENU);
+VOID HandleDrawItem (HWND hWnd, LPDRAWITEMSTRUCT lpdis);

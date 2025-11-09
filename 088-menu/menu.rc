@@ -1,0 +1,110 @@
+#include <windows.h>
+#include "menu.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+MENUAPPMENU MENU DISCARDABLE
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "退出(&X)", IDM_EXIT
+    END
+    POPUP "编辑(&E)"
+    BEGIN
+        MENUITEM "撒销(&U)", IDM_EDITUNDO, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "剪切(&T)", IDM_EDITCUT
+        MENUITEM "复制(&C)", IDM_EDITCOPY
+        MENUITEM "粘贴(&P)", IDM_EDITPASTE
+        MENUITEM "删除(&D)", IDM_EDITDELETE
+        MENUITEM SEPARATOR
+        MENUITEM "全部选定(&A)", IDM_EDITSELECTALL
+    END
+    POPUP "查看(&V)"
+    BEGIN
+        MENUITEM "工具栏(&T)", IDM_SHOWTOOLBAR
+        MENUITEM "状态栏(&S)", IDM_SHOWSTATUSBAR
+    END
+    POPUP "字体(&T)"
+    BEGIN
+        MENUITEM "选择字体字样(&F). . .", IDM_SELECTFONTFACE
+        POPUP "选择字体风格(&S)"
+        BEGIN
+        MENUITEM "粗体(&B)", IDM_BOLD
+        MENUITEM "斜体(&I)", IDM_ITALIC
+        MENUITEM "加下划线(&U)", IDM_UNDERLINE
+        MENUITEM "加删除线(&S)", IDM_STRIKEOUT
+        END
+        POPUP "设置字体尺寸(&Z)"
+        BEGIN
+            MENUITEM "小号字体(&S)", IDM_SMALLFONTSIZE
+            MENUITEM "中号字体(&M)", IDM_NORMALFONTSIZE
+            MENUITEM "大号字体(&L)", IDM_LARGEFONTSIZE
+        END
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "关于(&A)...", IDM_ABOUT
+    END
+END
+
+EDITPOPUPMENU MENU DISCARDABLE
+BEGIN
+    POPUP "编辑"
+    BEGIN
+        MENUITEM "剪切", IDM_EDITCUT
+        MENUITEM "复制", IDM_EDITCOPY
+        MENUITEM "粘贴", IDM_EDITPASTE
+        MENUITEM "删除", IDM_EDITDELETE
+        MENUITEM SEPARATOR
+        POPUP "对齐方式"
+        BEGIN
+            MENUITEM "左对齐", IDM_ALIGNLEFT
+            MENUITEM "居中", IDM_ALIGNCENTER
+            MENUITEM "右对齐", IDM_ALIGNRIGHT
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "关于…", IDM_ABOUT
+    END
+END
+
+
+FONTSTYLEPOPUPMENU MENU DISCARDABLE
+BEGIN
+    POPUP "字体风格"
+    BEGIN
+        MENUITEM "粗体", IDM_BOLD
+        MENUITEM "斜体", IDM_ITALIC
+        MENUITEM "加下划线", IDM_UNDERLINE
+        MENUITEM "加删除线", IDM_STRIKEOUT
+    END
+END
+
+
+/////////////////////////////////////////'////////////////////////.//’///////./////
+
+//
+// Dialog
+
+ABOUTBOX DIALOG DISCARDABLE 20, 25, 124, 77
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "关于菜单示范程序"
+FONT 11,"宋体"
+BEGIN
+    PUSHBUTTON "确定", IDOK, 59, 57, 40, 14
+    CTEXT "本示范程序介绍了各种类型和风格的菜单,如浮动弹出式菜单、位图菜单、自面菜单等.", -1, 15, 0, 100, 25
+    ICON "WINLOGO", -1, 14, 38, 18, 20
+    CONTROL "", -1, "Static", SS_BLACKFRAME, 56, 40, 56, 1
+END
+
+// Icon
+// MENUAPPICON ICON DISCARDABLE "menu.ico"
+// SMALLICON ICON DISCARDABLE "small.ico"
+
+// Bitmap
+ALIGNRIGHT  BITMAP DISCARDABLE "right.bmp"
+ALIGNLEFT   BITMAP DISCARDABLE "left.bmp"
+ALIGNCENTER BITMAP DISCARDABLE "center.bmp"
+CHECKMARK   BITMAP DISCARDABLE "check.bmp"
+UNCHECKMARK BITMAP DISCARDABLE "uncheck.bmp"
