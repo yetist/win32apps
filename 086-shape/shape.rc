@@ -1,0 +1,76 @@
+#include <windows.h>
+#include "shape.h"
+
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+//
+// Icon
+//
+
+//SHAPEICON ICON DISCARDABLE "Shape.ico"
+//SHAPESMALLICON ICON DISCARDABLE "Small.ico"
+
+//
+// Menu
+//
+
+SHAPEMENU MENU DISCARDABLE
+BEGIN
+    POPUP "封闭图形(&S)"
+    BEGIN
+        MENUITEM "退出(&X)", IDM_EXIT
+    END
+    POPUP "画笔选项(&P)"
+    BEGIN
+        POPUP "宽度(&W)"
+        BEGIN
+            MENUITEM "&1", IDM_W1, CHECKED
+            MENUITEM "&2", IDM_W2
+            MENUITEM "&3", IDM_W3
+            MENUITEM "&4", IDM_W4
+        END
+        POPUP "风格(&S)"
+        BEGIN
+            MENUITEM "实线(&S)", IDM_SOLID, CHECKED
+            MENUITEM "划线(&A)", IDM_DASH
+            MENUITEM "点线(&O)", IDM_DOT
+        END
+        POPUP "颜色(&C)"
+        BEGIN
+            MENUITEM "红(&R)", IDM_RED
+            MENUITEM "黄(&Y)", IDM_YELLOW
+            MENUITEM "绿(&G)", IDM_GREEN
+            MENUITEM "蓝(&B)", IDM_BLUE
+            MENUITEM "黑(&K)", IDM_BLACK, CHECKED
+        END
+    END
+    POPUP "画刷选项(&B)"
+    BEGIN
+        POPUP "实心画刷(&S)"
+        BEGIN
+            MENUITEM "红(&R)", IDM_BRED
+            MENUITEM "黄(&Y)", IDM_BYELLOW
+            MENUITEM "绿(&G)", IDM_BGREEN
+            MENUITEM "蓝(&B)", IDM_BBLUE
+        END
+        POPUP "阴影画刷(&H)"
+        BEGIN
+            MENUITEM "水平线(&H)", IDM_BHORIZONTAL
+            MENUITEM "垂直线(&V)", IDM_BVERTICAL
+            MENUITEM "反对角线(&F)", IDM_BFDIAGONAL
+            MENUITEM "正对角线(&B)", IDM_BBDIAGONAL
+            MENUITEM "交叉线(&C)", IDM_BCROSS
+            MENUITEM "斜交叉线(&D)", IDM_BDIAGCROSS
+        END
+        POPUP "库存画刷(&K)"
+        BEGIN
+            MENUITEM "白(&W)", IDM_BWHITE
+            MENUITEM "浅灰(&L)", IDM_BLTGRAY
+            MENUITEM "灰(&G)", IDM_BGRAY
+            MENUITEM "深灰(&B)", IDM_BBKGRAY
+            MENUITEM "黑(&K)", IDM_BBLACK
+            MENUITEM "空(&ND)", IDM_BNULL
+        END
+    END
+END

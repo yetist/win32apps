@@ -1,0 +1,74 @@
+#include <windows.h>
+#include "font.h"
+
+// 资源文件是utf8编码
+#pragma code_page(65001)
+
+// Menu
+FONTMENU MENU DISCARDABLE
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "退出(&X)", IDM_EXIT
+    END
+    POPUP "选项(&O)"
+    BEGIN
+        MENUITEM "粗体(&B)", IDM_BOLD
+        MENUITEM "斜体(&I)", IDM_ITALIC
+        MENUITEM "加下划线(&U)", IDM_UNDERLINE
+        MENUITEM "加删除线(&S)", IDM_STRIKEOUT
+    END
+    POPUP "字体(&T)"
+    BEGIN
+        MENUITEM "<(前面的字体)", IDM_PAGEUP, GRAYED
+    END
+    POPUP "旋转(&E)"
+    BEGIN
+        MENUITEM "不旋转(&0)", IDM_ESC00
+        MENUITEM "旋转5度(&1)", IDM_ESC05
+        MENUITEM "旋转10度(&c2)", IDM_ESC10
+        MENUITEM "旋转30度(&3)", IDM_ESC30
+        MENUITEM "旋转60度(&4)", IDM_ESC60
+        MENUITEM "旋转90度(&5)", IDM_ESC90
+        MENUITEM "旋转135度(&.6)", IDM_ESC135
+        MENUITEM "旋转180度(&7)", IDM_ESC180
+        MENUITEM "反转45度(&8)", IDM_ESC315
+        MENUITEM "反转10度(&9)", IDM_ESC350
+        MENUITEM "反转5度(&A)", IDM_ESC351
+    END
+    POPUP "格式(&MD)"
+    BEGIN
+        MENUITEM "左对齐(&L)", IDM_ALIGNLEFT
+        MENUITEM "居中(&C)", IDM_ALIGNCENTER
+        MENUITEM "右对齐(&R)", IDM_ALIGNRIGHT
+        MENUITEM SEPARATOR
+        MENUITEM "增大字符间隔(&I)\tCtrl+>", IDM_INCSPACE
+        MENUITEM "减小字符间隔(&D)", IDM_DECSPACE
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "关于(&A)...", IDM_ABOUT
+    END
+END
+
+// Dialog
+ABOUTBOX DIALOG DISCARDABLE 20, 25, 124, 77
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "关于字体和文字输出示范程序"
+FONT 14, "System"
+BEGIN
+    PUSHBUTTON "确定", IDOK, 43, 51, 40, 14
+    CTEXT "字体和文字输出示范程序", IDC_STATIC, 22, 9, 92, 8
+    CTEXT "XXX编写", IDC_STATIC, 30, 24, 76, 10, NOT WS_GROUP
+    CTEXT "一九九六年九月", IDC_STATIC, 36, 37, 65, 8, NOT WS_GROUP
+    ICON "FONTICON", IDC_STATIC, 11, 23, 18, 20
+    CONTROL "", IDC_STATIC, "Static", SS_BLACKFRAME, 40, 34, 56, 1
+END
+
+// Accelerator
+FONTACCEL ACCELERATORS DISCARDABLE
+BEGIN
+    "D", IDM_DECSPACE, VIRTKEY, CONTROL, NOINVERT
+    "I", IDM_INCSPACE, VIRTKEY, CONTROL, NOINVERT
+END
+
